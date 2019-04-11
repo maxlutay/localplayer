@@ -16,10 +16,10 @@ var mylist = [];
 
 localStorage.setItem("mylist", JSON.stringify(mylist));
 
+window.addEventListener("dragover",e => e.preventDefault(),false);
+
 window.addEventListener("drop",event => {
     event.preventDefault();
-
-
 
 
     mylist.push(event);

@@ -12,9 +12,8 @@
 <script>
 
 
-var mylist = [];
+var myaudio = {};
 
-localStorage.setItem("mylist", JSON.stringify(mylist));
 
 window.addEventListener("dragover",e => e.preventDefault(),false);
 
@@ -22,12 +21,13 @@ window.addEventListener("drop",event => {
     event.preventDefault();
 
 
-    mylist.push(event.dataTransfer.files[0]);
+    myaudio[event.dataTransfer.files[0].name] = event.dataTransfer.files[0].getAsFile();
 
-    localStorage.setItem("mylist", JSON.stringify(mylist));
+    localStorage.setItem("myaudio", JSON.stringify(Object.keys(myaudio)) );
 
 
-    console.log(event.dataTransfer.files[0]);
+    console.log(event.dataTransfer.files[0].name);
+    console.log(Object.keys(myaudio));
 });
 
 

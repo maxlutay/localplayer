@@ -1,39 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>localplayer</title>
 </head>
+
 <body style="width:100vw;height:100vh;padding: 0; margin: 0; background-color: darkseagreen;">
-    
-
-<script>
 
 
-var myaudio = {};
+    <script>
 
 
-window.addEventListener("dragover",e => e.preventDefault(),false);
-
-window.addEventListener("drop",event => {
-    event.preventDefault();
+        let myaudio = {};
 
 
-    myaudio[event.dataTransfer.files[0].name] = event.dataTransfer.files[0].getAsFile();
+        window.addEventListener("dragover", e => e.preventDefault(), false);
 
-    localStorage.setItem("myaudio", JSON.stringify(Object.keys(myaudio)) );
+        window.addEventListener("drop", event => {
+            event.preventDefault();
+
+            let items = event.dataTransfer.items;
+
+            for (let i = 0, l = items.length; i < l; ++i) {
+
+                myaudio[items[i].name] = event.dataTransfer.items[i].getAsFile();
+
+                localStorage.setItem("myaudio", JSON.stringify(Object.keys(myaudio)));
 
 
-    console.log(event.dataTransfer.files[0].name);
-    console.log(Object.keys(myaudio));
-});
+                console.log(event.dataTransfer.items[0].name);
+                console.log(Object.keys(myaudio));
+            };
+        });
 
 
 
 
-</script>
+    </script>
 
 </body>
+
 </html>

@@ -6,15 +6,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>localplayer</title>
+    <style>
+        body * {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            outline: 0;
+        }
+
+        #tracks {
+            width: 100%;
+        }
+
+        #tracks>li {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #tracks>li>audio {
+            flex: 1 auto;
+            max-width: 60%;
+
+        }
+    </style>
 </head>
 
-<body style="width:100vw;height:100vh;padding: 0; margin: 0; background-color: darkseagreen;">
+<body style="width:100vw;height:100vh;max-width: 100%;background-color: salmon;">
 
+    <ul id="tracks">
+    </ul>
+    <audio id="player"></audio>
 
     <script>
 
 
-        let myaudio = {};
+        let domtrackslist = document.querySelector("#tracks");
+
+        let audiolist = [];
+
+        let audiohookslist = new Proxy(audiolist, {
+            "set": function (otarget, skey, vvalue) {
+
+                if (isNaN(+skey)) { otarget[skey] = vvalue; return true; }
+
+                if (!vvalue.url || !vvalue.name) { return false; };
+
+                otarget.push(vvalue);
+
+                let li = document.createElement("li");
+                li.innerText = vvalue.name;
+
+                let audio = document.createElement("audio");
+                audio.src = vvalue.url;
+                audio.controls = "controls";
+
+
+                let audioonplayend = function (el) {
+                    let next;
+                    try {
+
+
+                        try {
+                            next = audio.parentElement.nextElementSibling.firstElementChild;
+                        } catch{ };
+
+                        if (!next) {
+                            next = audio.parentElement.parentElement.firstElementChild.firstElementChild;
+                        };
+
+                        if (next.tagName.toLowerCase() != "audio") return true;
+
+                        next.play();
+                    } finally {
+                        return true;
+                    };
+
+
+                };
+
+                audio.addEventListener("ended", audioonplayend);
+
+                li.appendChild(audio);
+                domtrackslist.appendChild(li);
+
+                return true;
+            }
+        });
 
 
         window.addEventListener("dragover", e => e.preventDefault(), false);
@@ -22,17 +100,14 @@
         window.addEventListener("drop", event => {
             event.preventDefault();
 
-            let items = event.dataTransfer.items;
+            let files = event.dataTransfer.files;
 
-            for (let i = 0, l = items.length; i < l; ++i) {
+            for (let i = 0, l = files.length; i < l; ++i) {
+                let file = files[i];
 
-                myaudio[items[i].name] = event.dataTransfer.items[i].getAsFile();
+                audiohookslist.push({ url: URL.createObjectURL(file), name: file.name });
 
-                localStorage.setItem("myaudio", JSON.stringify(Object.keys(myaudio)));
-
-
-                console.log(event.dataTransfer.items[0].name);
-                console.log(Object.keys(myaudio));
+                console.log(audiolist);
             };
         });
 

@@ -16,8 +16,11 @@ var mylist = [];
 
 localStorage.setItem("mylist", JSON.stringify(mylist));
 
-document.addEventListener("drop",event => {
+window.addEventListener("drop",event => {
     event.preventDefault();
+
+
+
 
     mylist.push(event);
 
@@ -26,6 +29,9 @@ document.addEventListener("drop",event => {
 
     console.log(event);
 });
+
+
+
 
 </script>
 

@@ -73,7 +73,6 @@
                     let next;
                     try {
 
-
                         try {
                             next = audio.parentElement.nextElementSibling.firstElementChild;
                         } catch{ };
@@ -82,9 +81,8 @@
                             next = audio.parentElement.parentElement.firstElementChild.firstElementChild;
                         };
 
-                        if (next.tagName.toLowerCase() != "audio") return true;
+                        if (next.tagName.toLowerCase() === "audio") next.play();
 
-                        next.play();
                     } finally {
                         return true;
                     };

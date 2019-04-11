@@ -22,7 +22,7 @@ window.addEventListener("drop",event => {
     event.preventDefault();
 
 
-    mylist.push(event);
+    mylist.push(event.dataTransfer.files[0]);
 
     localStorage.setItem("mylist", JSON.stringify(mylist));
 

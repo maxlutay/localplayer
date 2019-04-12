@@ -8,9 +8,7 @@ let URLS_TO_CACHE = ["/"];
 self.addEventListener("install", event => {
     event.waitUntill(
         caches.open(CACHE_NAME)
-        .then(cache =>  console.log("Cache opened"),
-                        cache.addAll(URLS_TO_CACHE)
-        )
+        .then(cache =>  (console.log("Cache opened"),cache.addAll(URLS_TO_CACHE)) )
     );
 });
 

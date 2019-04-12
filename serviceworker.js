@@ -6,7 +6,7 @@ let URLS_TO_CACHE = ["/"];
 
 
 self.addEventListener("install", e => {
-    e.waitUntill(
+    e.waitUntil(
         caches.open(CACHE_NAME)
         .then(cache =>  (console.log("Cache opened"),cache.addAll(URLS_TO_CACHE)) )
     );

@@ -5,15 +5,15 @@ let URLS_TO_CACHE = ["/"];
 
 
 
-self.addEventListener("install", event => {
-    event.waitUntill(
+self.addEventListener("install", e => {
+    e.waitUntill(
         caches.open(CACHE_NAME)
         .then(cache =>  (console.log("Cache opened"),cache.addAll(URLS_TO_CACHE)) )
     );
 });
 
 self.addEventListener("fetch", function (e) {
-    e.respondWith(caches.match(event.request).then(req => req || fetch(e.request)));
+    e.respondWith(caches.match(e.request).then(req => req || fetch(e.request)));
 });
 
 

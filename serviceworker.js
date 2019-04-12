@@ -1,5 +1,5 @@
 let CACHE_NAME = "localplayer_cache_v1";
-let URLS_TO_CACHE = ["/"];
+let URLS_TO_CACHE = ["/localplayer/","/localplayer/index.html"];
 
 
 

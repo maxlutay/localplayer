@@ -118,7 +118,7 @@
         });
 
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register("serviceworker.js", { scope: "/localplayer" })
+            navigator.serviceWorker.register("/localplayer/serviceworker.js", { scope: "/localplayer/" })
                 .then(_ => console.log("sw ok"))
                 .catch(_ => `sw not ok : ${_}`);
         }else{

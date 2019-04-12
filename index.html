@@ -48,7 +48,6 @@
 
     <script>
 
-
         let domtrackslist = document.querySelector("#tracks");
 
         let audiolist = [];
@@ -71,8 +70,8 @@
 
 
                 let audioonplayend = function (el) {
-                    let next;
                     try {
+                        let next;
 
                         try {
                             next = audio.parentElement.nextElementSibling.firstElementChild;
@@ -87,8 +86,6 @@
                     } finally {
                         return true;
                     };
-
-
                 };
 
                 audio.addEventListener("ended", audioonplayend);
@@ -113,15 +110,14 @@
 
                 audiohookslist.push({ url: URL.createObjectURL(file), name: file.name });
 
-                console.log(audiolist);
             };
         });
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register("/localplayer/serviceworker.js", { scope: "/localplayer/" })
                 .then(_ => console.log("sw ok"))
-                .catch(_ => `sw not ok : ${_}`);
-        }else{
+                .catch(_ => console.log(`sw not ok : ${_}`));
+        } else {
             console.log("no sw ");
         };
 

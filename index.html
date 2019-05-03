@@ -44,58 +44,77 @@
 
     <ul id="tracks">
     </ul>
-    <audio id="player"></audio>
 
     <script>
 
-        let domtrackslist = document.querySelector("#tracks");
 
+        let domtrackslist = document.querySelector("#tracks");
         let audiolist = [];
+        audiolist.i = -1;
+        audiolist.next = function (otarget = this) {
+            if (otarget.length < 1) { otarget.i = -1; throw "storage length < 0"; };
+            ++otarget.i;
+            if (otarget.i >= otarget.length) { otarget.i = 0; };
+            return otarget[otarget.i];
+        };
+
+
+        let audio = document.createElement("audio");
+        audio.controls = "controls";
+        document.body.appendChild(audio);
+
+        function audioonplayend(el) {
+            debugger;
+            el.target.src = audiohookslist.next().url;
+            el.target.play();
+            return true;
+            /*
+                        try {
+                            let next;
+            
+                            try {
+                                next = audio.parentElement.nextElementSibling.firstElementChild;
+                            } catch{ };
+            
+                            if (!next) {
+                                next = audio.parentElement.parentElement.firstElementChild.firstElementChild;
+                            };
+            
+                            if (next.tagName.toLowerCase() === "audio") next.play();
+            
+                        } finally {
+                            return true;
+                        };
+            */
+        };
+
+        audio.addEventListener("ended", audioonplayend);
+
+
 
         let audiohookslist = new Proxy(audiolist, {
+
             "set": function (otarget, skey, vvalue) {
 
-                if (isNaN(+skey)) { otarget[skey] = vvalue; return true; }
+                //if key is not a number, set anyway
+                if (isNaN(+skey)) { otarget[skey] = vvalue; return true; };
 
+                //if key is number, check object properties
                 if (!vvalue.url || !vvalue.name) { return false; };
 
                 otarget.push(vvalue);
 
                 let li = document.createElement("li");
                 li.innerText = vvalue.name;
-
-                let audio = document.createElement("audio");
-                audio.src = vvalue.url;
-                audio.controls = "controls";
-
-
-                function audioonplayend (el) {
-                    try {
-                        let next;
-
-                        try {
-                            next = audio.parentElement.nextElementSibling.firstElementChild;
-                        } catch{ };
-
-                        if (!next) {
-                            next = audio.parentElement.parentElement.firstElementChild.firstElementChild;
-                        };
-
-                        if (next.tagName.toLowerCase() === "audio") next.play();
-
-                    } finally {
-                        return true;
-                    };
-                };
-
-                audio.addEventListener("ended", audioonplayend);
-
-                li.appendChild(audio);
                 domtrackslist.appendChild(li);
+
+                if (!audio.src) { audio.src = vvalue.url };
 
                 return true;
             }
         });
+
+
 
 
         window.addEventListener("dragover", e => e.preventDefault(), false);
@@ -107,9 +126,7 @@
 
             for (let i = 0, l = files.length; i < l; ++i) {
                 let file = files[i];
-
                 audiohookslist.push({ url: URL.createObjectURL(file), name: file.name });
-
             };
         });
 

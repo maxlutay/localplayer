@@ -108,7 +108,7 @@
                 li.innerText = vvalue.name;
                 domtrackslist.appendChild(li);
 
-                if (!audio.src) { audio.src = vvalue.url };
+                if (audio.src == undefined) { audio.src = vvalue.url };
 
                 return true;
             }

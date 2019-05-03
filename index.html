@@ -50,9 +50,10 @@
 
         let domtrackslist = document.querySelector("#tracks");
         let audiolist = [];
-        audiolist.i = -1;
+        audiolist.i = 0;
+
         audiolist.next = function (otarget = this) {
-            if (otarget.length < 1) { otarget.i = -1; throw "storage length < 0"; };
+            if (otarget.length < 1) { otarget.i = -1; throw "storage length less or equal 0"; };
             ++otarget.i;
             if (otarget.i >= otarget.length) { otarget.i = 0; };
             return otarget[otarget.i];

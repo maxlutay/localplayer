@@ -56,7 +56,6 @@
 
     #tracks {
       width: 100%;
-      max-height: 60vh;
       overflow-x: scroll;
       background-color: lightcyan;
     }
@@ -189,13 +188,51 @@
   class Player{
 
     constructor(){
-      let dom_audio = document.createElement("audio");
-      dom_audio.controls = "controls";
-      document.querySelector(".player").appendChild(dom_audio);
+      let dom_player = this.dom_player = document.createElement("audio");
+      dom_player.controls = "controls";
+      document.querySelector(".player").appendChild(dom_player);
     }
 
   }
 
+  class Playlist extends Array {
+    #current_track_i = 0;
+    //needed two enums, beneath is temporary solution, maybe getters/setters
+    #repeat_playlist = false;
+    #repeat_current=false;
+    #norepeat=true
+    #sequental=true;
+    #random=false;
+
+    constructor(){
+      super();
+    };
+
+    next(){
+
+    }
+
+    sequental_next(){
+      const t = this;
+      if( t.length < 1) { t.#current_track_i = -1;throw  new Error("storage length less or equal 0"); };
+      
+      if(!t.repeat_single){ 
+        ++this.#current_track_i;
+        if(t.repeat_playlist && t.#current_track_i >= this.length) {
+          t.#current_track_i=0;
+        };
+      };
+      
+      return t[t.#current_track_i];
+    };
+
+    random_next(){
+      const t = this;
+      
+    };
+
+    
+ 
 
   let dom_tracks_list = document.querySelector("#tracks");
   let audio_array = [];

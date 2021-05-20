@@ -26,26 +26,33 @@
       align-items: stretch;
     }
    
-    #fileinput_container {
+    .topping {
       background-color: lightgreen;
       height: 8vh;
       width: 100%;
-      position: relative;
-    }
+;
 
-    #fileinput_container > * {
-      width: 100%;
       display: flex;
-      justify-items: center;
+      flex-display: row; 
+      justify-content: center;
       align-items: center;
     }
-    
-    #fileinput{
+
+    #fileinput_container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width:50%;
+      height: 100%;
+      position: relative;
+   }
+
+   #fileinput {
       width:100%;
       height: 100%;
-      position: absolute;
       z-index:100;
       opacity: 0;
+      position: absolute;
     }
 
     #tracks {
@@ -71,9 +78,16 @@
 </head>
 
 <body>
-  <div id="fileinput_container">
-    <input type="file" multiple id="fileinput" name="fileinput" />
-    <p>Add +</p>
+  <div class="topping">
+    <div id="fileinput_container">
+      <input type="file" multiple id="fileinput" name="fileinput" />
+      <label for="fileinput" id="fileinput_label">Add +</label>
+    </div>
+    <div id="urlinput_container">
+      <input type="url" id="urlinput" name="urlinput">
+      <label for="urlinput">audio exists</label>
+      <button>Add +</button>
+    </div>
   </div>
 
   <ul id="tracks">  </ul>

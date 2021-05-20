@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>localplayer</title>
   <style>
     body,
@@ -20,11 +19,6 @@
       width: 100vw;
       height: 100vh;
       max-width: 100%;
-      background: sandybrown;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: stretch;
     }
    
     .topping {
@@ -34,7 +28,7 @@
 ;
 
       display: flex;
-      flex-display: row; 
+      flex-direction: row; 
       justify-content: center;
       align-items: center;
     }
@@ -62,7 +56,7 @@
 
     #tracks {
       width: 100%;
-      max-height: 70vh;
+      max-height: 60vh;
       overflow-x: scroll;
       background-color: lightcyan;
     }
@@ -76,34 +70,139 @@
 
     audio{
       width: 100%;
-      height: 15vh;
     }
+
+    .app{
+      width: 100vw;
+      height: 100vh;
+      background: sandybrown;
+      position: relative;
+    }
+
+    .app >* {
+      width: 100%;
+      display: flex;
+    }
+
+    ::root{ --footer-height: 15vh; }
+    .footer{
+      width:100%;
+      height: var(--footer-height);
+      position: absolute;
+      bottom:0;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: stretch;
+    }
+
+    .player_tab_toggler{}
+    .playlist_tab_toggler{}
+
+
+    ::root{ --tabs-height: calc(100vh - var(--footer-height)); }
+    .tabs{
+      position: absolute;
+      top: 0;
+      width:100%;
+      height: var(--tabs-height);
+    }
+ 
+    .main .playlist .player {
+      height: 100%;
+      width: 100%;
+    }
+
+    ::root{ --header-height: 15%; }
+    .header{
+      height: var(--header-height);
+      background: lightgreen;
+    }
+
+    ::root{ --feed-height: 85%; }
+    .feed{
+      height: var(--feed-height);;
+
+      flex-direction: column;
+      overflow-x: scroll;
+      background-color: lightcyan;
+    }
+
+    .feed .section{
+      width: 100%;
+    }
+
+    .playlist{   
+    }
+    .player{
+    }
+
+    .hidden{
+      visibility: hidden;
+    }
+
+    .visible {
+      visibility: visible;
+    }
+
+    
 
   </style>
 </head>
 
 <body>
-  <div class="topping">
-    <div id="fileinput_container">
-      <input type="file" multiple  accept="audio/*, video/*" id="fileinput" name="fileinput" />
-      <label for="fileinput" id="fileinput_label">Add local track</label>
-    </div>
-    <div id="urlinput_container">
-      <input type="url" id="urlinput" name="urlinput">
-      <label for="urlinput">audio <span>not</span> exists</label>
-      <button>Add remote url track</button>
-    </div>
-  </div>
+  <div class="app">
+ 
+  <nav class="footer">
+    <div class="playlist_tab_toggler"></div>
+    <div class="player_tab_toggler"></div>
+  </nav><!-- footer end -->
 
-  <ul id="tracks">  </ul>
+  <div class="tabs">
+    <main class="main visible">
+      <header class="header"></header><!-- header end -->
+      <div class="feed"></div><!-- feed end -->
+    </main><!-- main end -->
+    <div class="playlist">
+      <ul id="tracks"> </ul><!-- tracks end -->
+      <div class="controls"></div><!--controls end-->
+      <div class="add_file">
+        <div id="fileinput_container">
+          <input type="file" multiple  accept="audio/*, video/*" id="fileinput" name="fileinput" />
+          <label for="fileinput" id="fileinput_label">Add local track</label>
+        </div>
+        <div id="urlinput_container">
+          <input type="url" id="urlinput" name="urlinput">
+          <label for="urlinput">audio <span>not</span> exists</label>
+          <button>Add remote url track</button>
+        </div>
+      </div><!-- add_file end -->
+    </div><!-- playlist end -->
+  
+    <div class="player">
+    </div><!-- player end-->
+  </div><!-- tabs end -->
+  
+  </div><!-- app end -->
 
   <script defer>
-  let domtrackslist = document.querySelector("#tracks");
-  let audiolist = [];
-  audiolist.i = 0;
 
-  audiolist.next = function (otarget = this) {
-    if (otarget.length < 1) { otarget.i = -1; throw "storage length less or equal 0"; };
+  class Player{
+
+    constructor(){
+      let dom_audio = document.createElement("audio");
+      dom_audio.controls = "controls";
+      document.querySelector(".player").appendChild(dom_audio);
+    }
+
+  }
+
+
+  let dom_tracks_list = document.querySelector("#tracks");
+  let audio_array = [];
+  audio_array.i = 0;
+
+  audio_array.next = function (otarget = this) {
+    if (otarget.length < 1) { otarget.i = -1; throw  new Error("storage length less or equal 0"); };
     
     ++otarget.i;
     if (otarget.i >= otarget.length) { otarget.i = 0; };
@@ -112,20 +211,16 @@
   };
 
 
-  let audio = document.createElement("audio");
-  audio.controls = "controls";
-  document.body.appendChild(audio);
-
-  function audioonplayend(el) {
+  
+  function dom_audio_onplayend(el) {
     //debugger;
-    el.target.src = audiohookslist.next().url;
+    el.target.src = audio_hooks_list.next().url;
     el.target.play();
     return true;
   };
-
-  audio.addEventListener("ended", audioonplayend);
+  dom_audio.addEventListener("ended", dom_audio_onplayend);
   
-  let audiohookslist = new Proxy(audiolist, {
+  let audio_hooks_list = new Proxy(audio_array, {
     "set": function (otarget, skey, vvalue) {
 
      //if key is not a number, set anyway
@@ -138,29 +233,30 @@
 
      let li = document.createElement("li");
      li.innerText = vvalue.name;
-     domtrackslist.appendChild(li);
+     dom_tracks_list.appendChild(li);
 
-     if (audio.src == "") { audio.src = vvalue.url };
+     if (dom_audio.src == "") { dom_audio.src = vvalue.url };
        return true;
-     }
+     };
    });
 
-  const push_files_to_list = (player => (files => {
+  const mime_type_validator = ((player, file) => {
+      let can = player.canPlayType(file.type); // "" => false, ie cant
+      if(!can){ 
+        throw new Error("file extension defenitely cant be played");
+      };
+      //file extension can be unplayable, but file is playable
+  }).bind(audio);
+
+  const push_files_to_list = files => {
     for (let i = 0, l = files.length; i < l; ++i) {
       let file = files[i];
-      try{
-        let can = player.canPlayType(file.type); // "" => false, ie cant
-        if(!can){ 
-          throw new Error("file extension defenitely cant be played");
-        };
-      } catch (err){ 
-        console.error(err);
-        //continue;
-      };
-      
-      audiohookslist.push({ url: URL.createObjectURL(file), name: file.name });
+
+      try{mime_type_validator(file)}catch(err){console.error(err);};
+
+      audio_hooks_list.push({ url: URL.createObjectURL(file), name: file.name });
     };
-  }))(audio);
+  };
 
   let fileinput = document.querySelector("#fileinput");
   fileinput.addEventListener("change",e=>{

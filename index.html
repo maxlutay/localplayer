@@ -43,7 +43,8 @@
 </head>
 
 <body>
-
+    <input type="file" multiple id="fileinput">
+    
     <ul id="tracks">
     </ul>
 
@@ -119,18 +120,24 @@
 
 
 
-
-        window.addEventListener("dragover", e => e.preventDefault(), false);
-
-        window.addEventListener("drop", event => {
-            event.preventDefault();
-
-            let files = event.dataTransfer.files;
-
-            for (let i = 0, l = files.length; i < l; ++i) {
+        const push_files_to_list = files => {
+           for (let i = 0, l = files.length; i < l; ++i) {
                 let file = files[i];
                 audiohookslist.push({ url: URL.createObjectURL(file), name: file.name });
             };
+        };
+
+
+        let fileinput = document.querySelector("fileinput");
+        fileinput.addEventListener("change",e=>{
+             push_files_to_list(fileinput.files);
+        });
+
+        window.addEventListener("dragover", e => e.preventDefault(), false);
+        
+        window.addEventListener("drop", event => {
+            event.preventDefault();
+            push_files_to_list(event.dataTransfer.files);
         });
 
         if ('serviceWorker' in navigator) {

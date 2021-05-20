@@ -58,7 +58,7 @@
 
   <ul id="tracks">  </ul>
 
-  <script>
+  <script defer>
   let domtrackslist = document.querySelector("#tracks");
   let audiolist = [];
   audiolist.i = 0;
@@ -78,27 +78,10 @@
   document.body.appendChild(audio);
 
   function audioonplayend(el) {
-    debugger;
+    //debugger;
     el.target.src = audiohookslist.next().url;
     el.target.play();
     return true;
-    /*
-    try {
-      let next;
-      try {
-        next = audio.parentElement.nextElementSibling.firstElementChild;
-      } catch{ };
-            
-      if (!next) {
-        next = audio.parentElement.parentElement.firstElementChild.firstElementChild;
-      };
-
-      if (next.tagName.toLowerCase() === "audio") next.play();
-            
-    } finally {
-      return true;
-    };
-    */
   };
 
   audio.addEventListener("ended", audioonplayend);

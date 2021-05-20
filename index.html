@@ -149,7 +149,7 @@
     for (let i = 0, l = files.length; i < l; ++i) {
       let file = files[i];
       try{
-        let can = !player.canPlayType(file.type); // "" => false, ie cant
+        let can = player.canPlayType(file.type); // "" => false, ie cant
         if(!can){ 
           throw new Error("file defenitely cant be played");
         };

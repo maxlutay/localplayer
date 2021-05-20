@@ -151,11 +151,11 @@
       try{
         let can = player.canPlayType(file.type); // "" => false, ie cant
         if(!can){ 
-          throw new Error("file defenitely cant be played");
+          throw new Error("file extension defenitely cant be played");
         };
       } catch (err){ 
         console.error(err);
-        continue;
+        //continue;
       };
       
       audiohookslist.push({ url: URL.createObjectURL(file), name: file.name });

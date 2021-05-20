@@ -43,111 +43,103 @@
 </head>
 
 <body>
+  <div style="background-color=lightgreen">
     <label for="fileinput">Add tracks:</label>
     <input type="file" multiple id="fileinput" name="fileinput" />
+  </div>
+
+  <ul id="tracks">  </ul>
+
+  <script>
+  let domtrackslist = document.querySelector("#tracks");
+  let audiolist = [];
+  audiolist.i = 0;
+
+  audiolist.next = function (otarget = this) {
+    if (otarget.length < 1) { otarget.i = -1; throw "storage length less or equal 0"; };
     
-    <ul id="tracks">
-    </ul>
-
-    <script>
-
-
-        let domtrackslist = document.querySelector("#tracks");
-        let audiolist = [];
-        audiolist.i = 0;
-
-        audiolist.next = function (otarget = this) {
-            if (otarget.length < 1) { otarget.i = -1; throw "storage length less or equal 0"; };
-            ++otarget.i;
-            if (otarget.i >= otarget.length) { otarget.i = 0; };
-            return otarget[otarget.i];
-        };
+    ++otarget.i;
+    if (otarget.i >= otarget.length) { otarget.i = 0; };
+      
+    return otarget[otarget.i];
+  };
 
 
-        let audio = document.createElement("audio");
-        audio.controls = "controls";
-        document.body.appendChild(audio);
+  let audio = document.createElement("audio");
+  audio.controls = "controls";
+  document.body.appendChild(audio);
 
-        function audioonplayend(el) {
-            debugger;
-            el.target.src = audiohookslist.next().url;
-            el.target.play();
-            return true;
-            /*
-                        try {
-                            let next;
+  function audioonplayend(el) {
+    debugger;
+    el.target.src = audiohookslist.next().url;
+    el.target.play();
+    return true;
+    /*
+    try {
+      let next;
+      try {
+        next = audio.parentElement.nextElementSibling.firstElementChild;
+      } catch{ };
             
-                            try {
-                                next = audio.parentElement.nextElementSibling.firstElementChild;
-                            } catch{ };
+      if (!next) {
+        next = audio.parentElement.parentElement.firstElementChild.firstElementChild;
+      };
+
+      if (next.tagName.toLowerCase() === "audio") next.play();
             
-                            if (!next) {
-                                next = audio.parentElement.parentElement.firstElementChild.firstElementChild;
-                            };
-            
-                            if (next.tagName.toLowerCase() === "audio") next.play();
-            
-                        } finally {
-                            return true;
-                        };
-            */
-        };
+    } finally {
+      return true;
+    };
+    */
+  };
 
-        audio.addEventListener("ended", audioonplayend);
+  audio.addEventListener("ended", audioonplayend);
+  
+  let audiohookslist = new Proxy(audiolist, {
+    "set": function (otarget, skey, vvalue) {
 
+     //if key is not a number, set anyway
+     if (isNaN(+skey)) { otarget[skey] = vvalue; return true; };
 
+     //if key is number, check object properties
+     if (!vvalue.url || !vvalue.name) { return false; };
 
-        let audiohookslist = new Proxy(audiolist, {
+     otarget.push(vvalue);
 
-            "set": function (otarget, skey, vvalue) {
+     let li = document.createElement("li");
+     li.innerText = vvalue.name;
+     domtrackslist.appendChild(li);
 
-                //if key is not a number, set anyway
-                if (isNaN(+skey)) { otarget[skey] = vvalue; return true; };
+     if (audio.src == "") { audio.src = vvalue.url };
+       return true;
+     }
+   });
 
-                //if key is number, check object properties
-                if (!vvalue.url || !vvalue.name) { return false; };
+  const push_files_to_list = files => {
+    for (let i = 0, l = files.length; i < l; ++i) {
+      let file = files[i];
+      audiohookslist.push({ url: URL.createObjectURL(file), name: file.name });
+    };
+  };
 
-                otarget.push(vvalue);
+  let fileinput = document.querySelector("#fileinput");
+  fileinput.addEventListener("change",e=>{
+    push_files_to_list(fileinput.files);
+  });
 
-                let li = document.createElement("li");
-                li.innerText = vvalue.name;
-                domtrackslist.appendChild(li);
+  window.addEventListener("dragover", e => e.preventDefault(), false); 
+  window.addEventListener("drop", event => {
+    event.preventDefault();
+    push_files_to_list(event.dataTransfer.files);
+  });
 
-                if (audio.src == "") { audio.src = vvalue.url };
-
-                return true;
-            }
-        });
-
-
-
-        const push_files_to_list = files => {
-           for (let i = 0, l = files.length; i < l; ++i) {
-                let file = files[i];
-                audiohookslist.push({ url: URL.createObjectURL(file), name: file.name });
-            };
-        };
-
-
-        let fileinput = document.querySelector("#fileinput");
-        fileinput.addEventListener("change",e=>{
-             push_files_to_list(fileinput.files);
-        });
-
-        window.addEventListener("dragover", e => e.preventDefault(), false);
-        
-        window.addEventListener("drop", event => {
-            event.preventDefault();
-            push_files_to_list(event.dataTransfer.files);
-        });
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register("/localplayer/serviceworker.js", { scope: "/localplayer/" })
-                .then(_ => console.log("sw ok"))
-                .catch(_ => console.log(`sw not ok : ${_}`));
-        } else {
-            console.log("no sw ");
-        };
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register("/localplayer/serviceworker.js", { scope: "/localplayer/" })
+    .then(_ => console.log("sw ok"))
+    .catch(_ => console.log(`sw not ok : ${_}`));
+  } else {
+     console.log("no sw ");
+  };
 
 
     </script>

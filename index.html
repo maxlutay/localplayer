@@ -2,48 +2,54 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>localplayer</title>
-    <style>
-        body,
-        body * {
-            margin: 0;
-            padding: 0;
-            border: 0;
-            outline: 0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>localplayer</title>
+  <style>
+    body,
+    body * {
+      margin: 0;         
+      padding: 0;
+      border: 0;
+      outline: 0;
+    }
 
-        body {
-            width: 100vw;
-            height: 100vh;
-            max-width: 100%;
-            background: salmon;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: stretch;
-        }
+    body {
+      width: 100vw;
+      height: 100vh;
+      max-width: 100%;
+      background: salmon;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: stretch;
+    }
+   
+    fileinput_container {
+      backgroundColor: lightgreen;
+    }
 
-        #tracks {
-            width: 100%;
-        }
+    #tracks {
+      width: 100%;
+      backgroundColor: lightcyan;
+    }
 
-        #tracks>li {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-        }
+    #tracks>li {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+    }
 
-        audio{
-            width: 100%;
-        }
-    </style>
+    audio{
+      width: 100%;
+    }
+
+  </style>
 </head>
 
 <body>
-  <div style="background-color=lightgreen">
+  <div id="fileinput_container">
     <label for="fileinput">Add tracks:</label>
     <input type="file" multiple id="fileinput" name="fileinput" />
   </div>

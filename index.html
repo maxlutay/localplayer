@@ -145,13 +145,14 @@
      }
    });
 
-  const push_files_to_list = player => files => {
+  const push_files_to_list = (player => (files => {
     for (let i = 0, l = files.length; i < l; ++i) {
       let file = files[i];
       try{
-      if(!player.canPlayType(file.type)){ // "" => false, ie cant
-        throw Error("file defenitely cant be played");
-      };
+        let check = player.canPlayType(file.type);
+        if(!!check){ // "" => false, ie cant
+          throw new Error("file defenitely cant be played");
+        };
       } catch (err){ 
         console.error(err);
         continue;
@@ -159,7 +160,7 @@
       
       audiohookslist.push({ url: URL.createObjectURL(file), name: file.name });
     };
-  }(audio);
+  }))(audio);
 
   let fileinput = document.querySelector("#fileinput");
   fileinput.addEventListener("change",e=>{

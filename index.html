@@ -13,6 +13,7 @@
       padding: 0;
       border: 0;
       outline: 0;
+      box-sizing: border-box;
     }
 
     body {
@@ -36,6 +37,10 @@
       flex-display: row; 
       justify-content: center;
       align-items: center;
+    }
+
+    .topping >*{
+      border: 1px dashed darkslategray;
     }
 
     #fileinput_container {
@@ -81,12 +86,12 @@
   <div class="topping">
     <div id="fileinput_container">
       <input type="file" multiple id="fileinput" name="fileinput" />
-      <label for="fileinput" id="fileinput_label">Add +</label>
+      <label for="fileinput" id="fileinput_label">Add local track</label>
     </div>
     <div id="urlinput_container">
       <input type="url" id="urlinput" name="urlinput">
-      <label for="urlinput">audio exists</label>
-      <button>Add +</button>
+      <label for="urlinput">audio <span>not</span> exists</label>
+      <button>Add remote url track</button>
     </div>
   </div>
 

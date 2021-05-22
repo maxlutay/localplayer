@@ -54,13 +54,13 @@
       position: absolute;
     }
 
-    #tracks {
+    .tracks {
       width: 100%;
       overflow-x: scroll;
       background-color: lightcyan;
     }
 
-    #tracks>li {
+    .tracks>li {
       width: 100%;
       height: 10vh;
       display: flex;
@@ -162,7 +162,7 @@
       <div class="feed"></div><!-- feed end -->
     </main><!-- main end -->
     <div class="playlist">
-      <ul id="tracks"> </ul><!-- tracks end -->
+      <ul class="tracks"> </ul><!-- tracks end -->
       <div class="controls"></div><!--controls end-->
       <div class="add_file">
         <div id="fileinput_container">
@@ -185,39 +185,94 @@
 
   <script defer>
 
-  class PlayerWorker{
+  class Player_worker{
 
-    dom_player;
+    #dom_player;
+    #onplayend;
 
-    constructor({parent_element:document.querySelector(".player")}){
-      let dom_player = this.dom_player = document.createElement("audio");
+
+    constructor(){
+      let dom_player = this.#dom_player = document.createElement("audio");
       dom_player.controls = "controls";
-      attach_to_dom( parent_element );
+      
     };
 
-    attach_to_dom(parent_element){
-      parent_element.appendChild(dom_player);
+    attach_to_dom({parent_element}){
+      parent_element.appendChild(this.#dom_player);
     };
 
     play(track){
-      this.dom_player.src = track.url;
-      this.dom_player.play();
+      this.#dom_player.src = track.url;
+      this.#dom_player.play();
     };
-  }
+    
+    set play_end_callback(cb){
+     const t = this;
+     if(t.#onplayend) dom_player.removeEventListener(t.#onplayend);
+     t.#onplayend = cb;
+     if(cb) dom_player.addEventListener("ended", t.#onplayend);
+    };
+
+    get play_end_callback(){
+      const cb = t.#onplayend;//idk why i ve done this?
+      return cb;
+    };
+    
+  };// end Player_worker
+
+  class Player_controller {
+
+    player_worker = Player_worker();
+    playlist = Playlist();
+
+
+    constructor(){
+      player_worker.attach_to_dom( 
+       { parent_element:document.querySelector(".player")}
+      );
+      player_worker.play_end_callback = ()=>player_worker.play(playlist.next);
+      
+      
+    };
+
+
+  };//end Player_controller
+
 
   class Playlist {
-    #current_track_i = 0;
     
     #repeat_one_mode=false;
+    get repeat_one_mode() {return this.#repeat_one_mode;};
+
     #repeat_list=false;
+    get repeat_list_mode() {return this.#repeat_list;};
+
+    #current_track;
+    get current_track(){return this.#current_track;};
+    //set current_track(t_i){};//TODO!!!!!rearranging
 
     tracks = [];
-    play_order;//ref to other array
+    #play_order;//ref to other array
     #straight_order=new Straight_play_order();//stack?
-    #shuffled_order=new Shuffled_play_order();
+    #shuffled_order=new Shuffled_play_order();//architectural problem with setting track, inverse array needed
 
     constructor(){
       super();
+      this.#play_order=this.#straight_order;
+    };
+
+    add(track){
+      let i = -1 + tracks.push(tracks);//returns length after push, which -1 is the index of new element
+      this.#play_order.add(i);
+    };
+
+    get next(){
+      if(!repeat_one_mode) this.#current_track=tracks[this.#play_order.next({repeat:this.repeat_list_mode})];
+      return this.#current_track;
+    };
+    get prev(){
+      if(!repeat_one_mode) this.#current_track=tracks[this.#play_order.prev({repeat:this.repeat_list_mode})];
+      return this.#current_track;
     };
 
   };//end Playlist
@@ -235,7 +290,7 @@
         if(repeat){
           this.#current_i=0;
         }else{
-          this.#current_i=this.#container.length-1;
+          this.#current_i=(this.#container.length-1);
         };
       };
       return this.#container[this.#current_i];
@@ -258,6 +313,12 @@
     fill_from( order){
       throw new Error("not implemented");
     };
+
+    add(track){
+      throw new Error("not implemented");
+    };
+    get is_first(){ return this.#current_i===0; };
+    get is_last(){ return this.#current_i===(this.#container.length-1);};
   };//end Play_order
 
 
@@ -266,24 +327,38 @@
     fill_from(order){
       this.#container=Array.from(order);
     };
+    
+    add(w){
+      this.#container.push(w);
+    };
   };//end Straight_play_order
 
   class Shuffled_play_order extends Play_order{
+    inversed_order;
     constructor(){super();};
+
     fill_from(order){
       const c=Array.from(order);
 
       for (let i = c.length-1;i >=0;--i){
         const random_index = Math.round(Math.random()*i);
         c[i]=c[random_index];
+        inversed_order[random_index]=inversed_order[i];//experimental
       };
-
       this.#container = c;
     };
+
+    add(w){
+      const max_i = this.#container.length-1;
+      const random_index = Math.round(Math.random()*max_i);
+      this.#container.splice(random_index,0,w);//bevare the complexity=O(n)
+    };
+
   };//end Shuffled_play_order
 
 
   class Track{
+    id="";
     name="";
     url="";
     constructor(file){

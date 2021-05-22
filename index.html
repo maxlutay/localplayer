@@ -185,54 +185,114 @@
 
   <script defer>
 
-  class Player{
+  class PlayerWorker{
 
-    constructor(){
+    dom_player;
+
+    constructor({parent_element:document.querySelector(".player")}){
       let dom_player = this.dom_player = document.createElement("audio");
       dom_player.controls = "controls";
-      document.querySelector(".player").appendChild(dom_player);
-    }
+      attach_to_dom( parent_element );
+    };
 
+    attach_to_dom(parent_element){
+      parent_element.appendChild(dom_player);
+    };
+
+    play(track){
+      this.dom_player.src = track.url;
+      this.dom_player.play();
+    };
   }
 
-  class Playlist extends Array {
+  class Playlist {
     #current_track_i = 0;
-    //needed two enums, beneath is temporary solution, maybe getters/setters
-    #repeat_playlist = false;
-    #repeat_current=false;
-    #norepeat=true
-    #sequental=true;
-    #random=false;
+    
+    #repeat_one_mode=false;
+    #repeat_list=false;
+
+    tracks = [];
+    play_order;//ref to other array
+    #straight_order=new Straight_play_order();//stack?
+    #shuffled_order=new Shuffled_play_order();
 
     constructor(){
       super();
     };
 
-    next(){
+  };//end Playlist
+ 
+  class Play_order {
+    #current_i = 0;
+    #container = [];
+    constructor(){};
 
-    }
+    next({repeat:true}){
 
-    sequental_next(){
-      const t = this;
-      if( t.length < 1) { t.#current_track_i = -1;throw  new Error("storage length less or equal 0"); };
-      
-      if(!t.repeat_single){ 
-        ++this.#current_track_i;
-        if(t.repeat_playlist && t.#current_track_i >= this.length) {
-          t.#current_track_i=0;
+      ++this.#current_i;
+
+      if(this.#current_i>=this.#container.length){
+        if(repeat){
+          this.#current_i=0;
+        }else{
+          this.#current_i=this.#container.length-1;
         };
       };
-      
-      return t[t.#current_track_i];
+      return this.#container[this.#current_i];
     };
 
-    random_next(){
-      const t = this;
-      
-    };
+    prev({repeat:true}){
 
-    
+      --this.#current_i;
+
+      if(this.#current_i<0){
+        if(repeat){
+          this.#current_i=this.#container.length-1;
+        }else{
+          this.#current_i=0;
+        };
+      };
+      return this.#container[this.#current_i];
+    }
+
+    fill_from( order){
+      throw new Error("not implemented");
+    };
+  };//end Play_order
+
+
+  class Straight_play_order extends Play_order{
+    constructor(){super();};
+    fill_from(order){
+      this.#container=Array.from(order);
+    };
+  };//end Straight_play_order
+
+  class Shuffled_play_order extends Play_order{
+    constructor(){super();};
+    fill_from(order){
+      const c=Array.from(order);
+
+      for (let i = c.length-1;i >=0;--i){
+        const random_index = Math.round(Math.random()*i);
+        c[i]=c[random_index];
+      };
+
+      this.#container = c;
+    };
+  };//end Shuffled_play_order
+
+
+  class Track{
+    name="";
+    url="";
+    constructor(file){
+      this.name=file.name;
+      this.url=URL.createObjectURL(file);
+    }
+  };//end Track
  
+
 
   let dom_tracks_list = document.querySelector("#tracks");
   let audio_array = [];

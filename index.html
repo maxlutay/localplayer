@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,13 +7,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>localplayer</title>
   <style>
-    body,
-    body * {
+     body, body * {
       margin: 0;         
       padding: 0;
       border: 0;
       outline: 0;
       box-sizing: border-box;
+    
+      border: 1px dashed darkslategray;
+    }
+    :root{
+      --footer-height: 15vh;
+      --tabs-height: calc(100vh - var(--footer-height)); 
+
+      --header-height: 15%; 
+      --feed-height: 85%; 
     }
 
     body {
@@ -21,21 +30,19 @@
       max-width: 100%;
     }
    
-    .topping {
-      background-color: lightgreen;
+    .add_file {
+      
       height: 15vh;
       width: 100%;
-;
+
 
       display: flex;
       flex-direction: row; 
-      justify-content: center;
-      align-items: center;
+      justify-content: space-between;
+      align-items: stretch;
     }
 
-    .topping >*{
-      border: 1px dashed darkslategray;
-    }
+    
 
     #fileinput_container {
       display: flex;
@@ -49,7 +56,7 @@
    #fileinput {
       width:100%;
       height: 100%;
-      z-index:100;
+      z-index:50;
       opacity: 0;
       position: absolute;
     }
@@ -57,7 +64,7 @@
     .tracks {
       width: 100%;
       overflow-x: scroll;
-      background-color: lightcyan;
+      
     }
 
     .tracks>li {
@@ -78,27 +85,32 @@
       position: relative;
     }
 
-    .app >* {
-      width: 100%;
-      display: flex;
-    }
-
-    ::root{ --footer-height: 15vh; }
+    
     .footer{
       width:100%;
       height: var(--footer-height);
       position: absolute;
       bottom:0;
+
+      display:flex;
       flex-direction: row;
       justify-content: space-between;
       align-items: stretch;
+      background: pink;
     }
 
-    .player_tab_toggler{}
-    .playlist_tab_toggler{}
+    .player_tab_toggler{
+       width:50%;
+     }
+    .playlist_tab_toggler{
+       width:50%;
+     }
 
-
-    ::root{ --tabs-height: calc(100vh - var(--footer-height)); }
+    .player_tab_toggler.active ,
+    .playlist_tab_toggler.active {
+      background: purple;
+    }
+    
     .tabs{
       position: absolute;
       top: 0;
@@ -106,24 +118,36 @@
       height: var(--tabs-height);
     }
  
-    .main .playlist .player {
+
+    .main{
+      background: darkblue;
+    }
+    .playlist{
+      background: darkgreen;
+    }
+    .player{
+      background: gold; 
+    }
+
+    .main, .playlist, .player {
+      position: absolute;
+
       height: 100%;
       width: 100%;
     }
 
-    ::root{ --header-height: 15%; }
+    
     .header{
       height: var(--header-height);
-      background: lightgreen;
+      
     }
 
-    ::root{ --feed-height: 85%; }
+   
     .feed{
       height: var(--feed-height);;
 
       flex-direction: column;
       overflow-x: scroll;
-      background-color: lightcyan;
     }
 
     .feed .section{
@@ -137,10 +161,12 @@
 
     .hidden{
       visibility: hidden;
+      z-index: 0;
     }
 
     .visible {
       visibility: visible;
+      z-index: 100;
     }
 
     
@@ -152,18 +178,18 @@
   <div class="app">
  
   <nav class="footer">
-    <div class="playlist_tab_toggler"></div>
-    <div class="player_tab_toggler"></div>
+    <div class="playlist_tab_toggler">playlist</div>
+    <div class="player_tab_toggler">player</div>
   </nav><!-- footer end -->
 
   <div class="tabs">
     <main class="main visible">
-      <header class="header"></header><!-- header end -->
-      <div class="feed"></div><!-- feed end -->
+      <header class="header">head</header><!-- header end -->
+      <div class="feed">feed</div><!-- feed end -->
     </main><!-- main end -->
-    <div class="playlist">
-      <ul class="tracks"> </ul><!-- tracks end -->
-      <div class="controls"></div><!--controls end-->
+    <div class="playlist hidden">
+      <ul class="tracks">tracks</ul><!-- tracks end -->
+      <div class="controls">controls</div><!--controls end-->
       <div class="add_file">
         <div id="fileinput_container">
           <input type="file" multiple  accept="audio/*, video/*" id="fileinput" name="fileinput" />
@@ -177,13 +203,14 @@
       </div><!-- add_file end -->
     </div><!-- playlist end -->
   
-    <div class="player">
+    <div class="player hidden">
     </div><!-- player end-->
   </div><!-- tabs end -->
   
   </div><!-- app end -->
 
   <script defer>
+
 
   class Player_worker{
 
@@ -192,22 +219,25 @@
 
 
     constructor(){
-      let dom_player = this.#dom_player = document.createElement("audio");
-      dom_player.controls = "controls";
+      this.#dom_player = document.createElement("audio");
+      this.#dom_player.controls = "controls";
       
     };
 
-    attach_to_dom({parent_element}){
-      parent_element.appendChild(this.#dom_player);
+    attach_to_dom({parent_element}={}){
+      console.log("worker rendered");
+parent_element.appendChild(this.#dom_player);
     };
 
     play(track){
+console.log("play", track);
       this.#dom_player.src = track.url;
       this.#dom_player.play();
       return true;
     };
     
     pause(track){
+console.log("pause", track);
       this.#dom_player.pause();
       if(track){ this.#dom_player.src = track.url;};
       this.#dom_player.pause();
@@ -216,9 +246,9 @@
 
     set play_end_callback(cb){
      const t = this;
-     if(t.#onplayend) dom_player.removeEventListener(t.#onplayend);
+     if(t.#onplayend) this.#dom_player.removeEventListener(t.#onplayend);
      t.#onplayend = cb;
-     if(cb) dom_player.addEventListener("ended", t.#onplayend);
+     if(cb) this.#dom_player.addEventListener("ended", t.#onplayend);
     };
 
     get play_end_callback(){
@@ -230,25 +260,36 @@
 
   class Player_controller {
 
-    player_worker = Player_worker();
-    playlist = Playlist();
-
+    player_worker ;
+    _playlist;
 
     constructor(){
-      player_worker.pause(playlist.current_track());
-      player_worker.attach_to_dom( 
-       { parent_element:document.querySelector(".player")}
-      );
-      player_worker.play_end_callback = ()=>player_worker.play(playlist.next);
+      this.player_worker = new Player_worker();
+      this._playlist = new Playlist();
+
+     this.attach_to_dom({parent_element: document});
+
+      this.player_worker.play_end_callback = ()=>player_worker.play(this._playlist.next);
       
     };
 
 
-    attach_to_dom({parent_element}){
-      player_worker.attach_to_dom( 
-       { parent_element:document.querySelector(".player")}
+    add(tr){
+      if(this._playlist.empty()){
+        this._playlist.add(tr);
+ 
+this.player_worker.pause(this._playlist.current_track);
+      }else{
+      this._playlist.add(tr);
+      };
+    }
+
+    attach_to_dom({parent_element}={}){
+//console.log("controller rendered");
+      this.player_worker.attach_to_dom( 
+       { parent_element : document.querySelector(".player")}
       );
-      playlist.attach_to_dom(
+      this._playlist.attach_to_dom(
        { parent_element:document.querySelector(".tracks")}
       );
     };
@@ -258,7 +299,7 @@
 
   class Playlist {
     
-    #repeat_one_mode=false;
+    #repeat_one_mode;
     get repeat_one_mode() {return this.#repeat_one_mode;};
 
     #repeat_list=false;
@@ -268,18 +309,25 @@
     get current_track(){return this.#current_track;};
     //set current_track(t_i){};//TODO!!!!!rearranging
 
-    tracks = [];
+    tracks;
     #play_order;//ref to other array
-    #straight_order=new Straight_play_order();//stack?
-    #shuffled_order=new Shuffled_play_order();//architectural problem with setting track, inverse array needed
+    #straight_order;//stack?
+    #shuffled_order;//architectural problem with setting track, inverse array needed
 
-    constructor(){
-      super();
-      this.#play_order=this.#straight_order;
+    constructor(){ 
+      this.#repeat_one_mode=false;
+      this.#repeat_list
+
+      this.tracks=[];
+
+      this.#straight_order=new Straight_play_order();//stack?
+      this.#shuffled_order=new Shuffled_play_order();
+     
+  this.#play_order=this.#straight_order;
     };
 
     add(track){
-      let i = -1 + tracks.push(tracks);//returns length after push, which -1 is the index of new element
+      let i = -1 + this.tracks.push(track);//returns length after push, which -1 is the index of new element
       this.#play_order.add(i);
     };
 
@@ -292,47 +340,53 @@
       return this.#current_track;
     };
 
-    attach_to_dom({parent_element}){
+    attach_to_dom({parent_element}={}){
+console.log("tracks rendered");
       for (let track of this.tracks) {
         track.attach_to_dom({parent_element});
       };
     };
 
-
+    empty(){
+      return 0 === this.tracks.length;
+    };
 
   };//end Playlist
  
   class Play_order {
-    #current_i = 0;
-    #container = [];
-    constructor(){};
-
-    next({repeat:true}){
-
-      ++this.#current_i;
-
-      if(this.#current_i>=this.#container.length){
-        if(repeat){
-          this.#current_i=0;
-        }else{
-          this.#current_i=(this.#container.length-1);
-        };
-      };
-      return this.#container[this.#current_i];
+    _current_i;
+    _container;
+    constructor(){
+      this._current_i = 0;
+      this._container = [];
     };
 
-    prev({repeat:true}){
+    next(repeat=true){
 
-      --this.#current_i;
+      ++this._current_i;
 
-      if(this.#current_i<0){
+      if(this._current_i>=this._container.length){
         if(repeat){
-          this.#current_i=this.#container.length-1;
+          this._current_i=0;
         }else{
-          this.#current_i=0;
+          this._current_i=(this._container.length-1);
         };
       };
-      return this.#container[this.#current_i];
+      return this._container[this._current_i];
+    };
+
+    prev(repeat=true){
+
+      --this._current_i;
+
+      if(this._current_i<0){
+        if(repeat){
+          this._current_i=this._container.length-1;
+        }else{
+          this._current_i=0;
+        };
+      };
+      return this._container[this._current_i];
     }
 
     fill_from( order){
@@ -342,19 +396,18 @@
     add(track){
       throw new Error("not implemented");
     };
-    get is_first(){ return this.#current_i===0; };
-    get is_last(){ return this.#current_i===(this.#container.length-1);};
+    
   };//end Play_order
 
 
   class Straight_play_order extends Play_order{
     constructor(){super();};
     fill_from(order){
-      this.#container=Array.from(order);
+      this._container=Array.from(order);
     };
     
     add(w){
-      this.#container.push(w);
+      this._container.push(w);
     };
   };//end Straight_play_order
 
@@ -370,28 +423,34 @@
         c[i]=c[random_index];
         inversed_order[random_index]=inversed_order[i];//experimental
       };
-      this.#container = c;
+      this._container = c;
     };
 
     add(w){
-      const max_i = this.#container.length-1;
+      const max_i = this._container.length-1;
       const random_index = Math.round(Math.random()*max_i);
-      this.#container.splice(random_index,0,w);//bevare the complexity=O(n)
+      this._container.splice(random_index,0,w);//bevare the complexity=O(n)
     };
 
   };//end Shuffled_play_order
 
 
   class Track{
-    id="";
-    name="";
-    url="";
+    id;
+    name;
+    url;
     constructor(file){
+    this.id="";
+    this.name="";
+    this.url="";
+
+
       this.name=file.name;
       this.url=URL.createObjectURL(file);
     }
 
-    attach_to_dom({parent_element}){
+    attach_to_dom({parent_element}={}){
+console.log("track rendered",this.name);
       let li = document.createElement("li");
       li.innerText = this.name;
       parent_element.appendChild(li);
@@ -406,10 +465,12 @@
   const player_brain = new Player_controller();
 
   const push_files_to_list = files => {
+console.log("pishfi");
     for (let i = 0, l = files.length; i < l; ++i) {
       let file = files[i];
-      player_brain.playlist.add(new Track(file));
+      player_brain.add(new Track(file));
     };
+  player_brain.attach_to_dom();
   };
 
   let fileinput = document.querySelector("#fileinput");
@@ -423,13 +484,65 @@
     push_files_to_list(event.dataTransfer.files);
   });
 
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register("/localplayer/serviceworker.js", { scope: "/localplayer/" })
-    .then(_ => console.log("sw ok"))
-    .catch(_ => console.log(`sw not ok : ${_}`));
-  } else {
-     console.log("no sw ");
+
+let [main,playlist,player] = [".main",".playlist",".player"].map(s=>document.querySelector(s).classList);
+
+let visible = 0;
+
+let [t1,t2]= [".player_tab_toggler",".playlist_tab_toggler"].map(s=>document.querySelector(s));
+
+t1.addEventListener("click",()=>{
+  if(visible!==1){
+
+    visible=1;
+
+    [main,playlist].map(e=>(e.remove("visible"),e)).map(e=>e.add("hidden"));
+    player.remove("hidden");
+    player.add("visible");
+
+    t2.classList.remove("active");
+    t1.classList.add("active");
+    
+  }else{
+    visible=0;
+
+    player.add("hidden");
+    player.remove("visible");
+    main.remove("hidden");
+    main.add("visible");
+
+    t1.classList.remove("active");
   };
+});
+
+t2.addEventListener("click",()=>{
+
+if(visible!==2){
+
+    visible=2;
+
+    [main,player].map(e=>(e.remove("visible"),e)).map(e=>e.add("hidden"));
+    playlist.remove("hidden");
+    playlist.add("visible");
+
+    t1.classList.remove("active");
+    t2.classList.add("active");
+  }else{
+    visible=0;
+
+    playlist.add("hidden");
+    playlist.remove("visible");
+    main.remove("hidden");
+    main.add("visible");
+
+    t2.classList.remove("active");
+  };
+});
+
+
+
+console.log("endcript")
+
 
 
     </script>

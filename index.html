@@ -204,8 +204,16 @@
     play(track){
       this.#dom_player.src = track.url;
       this.#dom_player.play();
+      return true;
     };
     
+    pause(track){
+      this.#dom_player.pause();
+      if(track){ this.#dom_player.src = track.url;};
+      this.#dom_player.pause();
+      return true;
+    };
+
     set play_end_callback(cb){
      const t = this;
      if(t.#onplayend) dom_player.removeEventListener(t.#onplayend);
@@ -227,14 +235,23 @@
 
 
     constructor(){
+      player_worker.pause(playlist.current_track());
       player_worker.attach_to_dom( 
        { parent_element:document.querySelector(".player")}
       );
       player_worker.play_end_callback = ()=>player_worker.play(playlist.next);
       
-      
     };
 
+
+    attach_to_dom({parent_element}){
+      player_worker.attach_to_dom( 
+       { parent_element:document.querySelector(".player")}
+      );
+      playlist.attach_to_dom(
+       { parent_element:document.querySelector(".tracks")}
+      );
+    };
 
   };//end Player_controller
 
@@ -274,6 +291,14 @@
       if(!repeat_one_mode) this.#current_track=tracks[this.#play_order.prev({repeat:this.repeat_list_mode})];
       return this.#current_track;
     };
+
+    attach_to_dom({parent_element}){
+      for (let track of this.tracks) {
+        track.attach_to_dom({parent_element});
+      };
+    };
+
+
 
   };//end Playlist
  
@@ -365,68 +390,25 @@
       this.name=file.name;
       this.url=URL.createObjectURL(file);
     }
+
+    attach_to_dom({parent_element}){
+      let li = document.createElement("li");
+      li.innerText = this.name;
+      parent_element.appendChild(li);
+    };
+
+    //render_string(){}
+
   };//end Track
  
 
 
-  let dom_tracks_list = document.querySelector("#tracks");
-  let audio_array = [];
-  audio_array.i = 0;
-
-  audio_array.next = function (otarget = this) {
-    if (otarget.length < 1) { otarget.i = -1; throw  new Error("storage length less or equal 0"); };
-    
-    ++otarget.i;
-    if (otarget.i >= otarget.length) { otarget.i = 0; };
-      
-    return otarget[otarget.i];
-  };
-
-
-  
-  function dom_audio_onplayend(el) {
-    //debugger;
-    el.target.src = audio_hooks_list.next().url;
-    el.target.play();
-    return true;
-  };
-  dom_audio.addEventListener("ended", dom_audio_onplayend);
-  
-  let audio_hooks_list = new Proxy(audio_array, {
-    "set": function (otarget, skey, vvalue) {
-
-     //if key is not a number, set anyway
-     if (isNaN(+skey)) { otarget[skey] = vvalue; return true; };
-
-     //if key is number, check object properties
-     if (!vvalue.url || !vvalue.name) { return false; };
-
-     otarget.push(vvalue);
-
-     let li = document.createElement("li");
-     li.innerText = vvalue.name;
-     dom_tracks_list.appendChild(li);
-
-     if (dom_audio.src == "") { dom_audio.src = vvalue.url };
-       return true;
-     };
-   });
-
-  const mime_type_validator = ((player, file) => {
-      let can = player.canPlayType(file.type); // "" => false, ie cant
-      if(!can){ 
-        throw new Error("file extension defenitely cant be played");
-      };
-      //file extension can be unplayable, but file is playable
-  }).bind(audio);
+  const player_brain = new Player_controller();
 
   const push_files_to_list = files => {
     for (let i = 0, l = files.length; i < l; ++i) {
       let file = files[i];
-
-      try{mime_type_validator(file)}catch(err){console.error(err);};
-
-      audio_hooks_list.push({ url: URL.createObjectURL(file), name: file.name });
+      player_brain.playlist.add(new Track(file));
     };
   };
 

@@ -212,22 +212,39 @@
   <script defer>
 
 
-  class Player_worker{
+
+
+  class Renderable{
+    _fragment;
+    #render_function;
+    constructor(renderfn){
+      this._fragment = new DocumentFragment();
+      this.#render_function = renderfn;
+    };
+    get dom(){
+      let d = this.#render_function();
+      if(d){this._fragment.append(d);};
+      return this._fragment;
+    };
+  }
+
+  class Player_worker extends Renderable {
 
     #dom_player;
     #onplayend;
 
 
     constructor(){
+      function render(){
+        console.log("render worker");
+        return this.#dom_player;
+      }
+      super(render);
       this.#dom_player = document.createElement("audio");
       this.#dom_player.controls = "controls";
       
     };
 
-    attach_to_dom({parent_element}={}){
-      console.log("worker rendered");
-parent_element.appendChild(this.#dom_player);
-    };
 
     play(track){
 console.log("play", track);
@@ -239,7 +256,9 @@ console.log("play", track);
     pause(track){
 console.log("pause", track);
       this.#dom_player.pause();
-      if(track){ this.#dom_player.src = track.url;};
+      if(track){ 
+console.log("setsrc");
+this.#dom_player.src = track.url;};
       this.#dom_player.pause();
       return true;
     };
@@ -258,46 +277,48 @@ console.log("pause", track);
     
   };// end Player_worker
 
-  class Player_controller {
+  class Player_controller extends Renderable {
 
     player_worker ;
     _playlist;
 
     constructor(){
+      function render(){
+        console.log("controller rendered");
+        let player_parent = document.querySelector(".player");
+ 
+        player_parent.replaceChildren(); 
+        player_parent.appendChild( this.player_worker.dom);
+        let tracks_parent = document.querySelector(".tracks");
+        tracks_parent.replaceChildren();
+        tracks_parent.appendChild( this._playlist.dom);
+    };
+
+      super(render);
+
       this.player_worker = new Player_worker();
       this._playlist = new Playlist();
-
-     this.attach_to_dom({parent_element: document});
-
-      this.player_worker.play_end_callback = ()=>player_worker.play(this._playlist.next);
+      this.player_worker.play_end_callback = ()=>this.player_worker.play(this._playlist.next);
       
+      this.dom;
     };
 
 
     add(tr){
       if(this._playlist.empty()){
         this._playlist.add(tr);
- 
-this.player_worker.pause(this._playlist.current_track);
+        this.player_worker.pause(this._playlist.next);
       }else{
-      this._playlist.add(tr);
+        this._playlist.add(tr);
       };
     }
 
-    attach_to_dom({parent_element}={}){
-//console.log("controller rendered");
-      this.player_worker.attach_to_dom( 
-       { parent_element : document.querySelector(".player")}
-      );
-      this._playlist.attach_to_dom(
-       { parent_element:document.querySelector(".tracks")}
-      );
-    };
+    
 
   };//end Player_controller
 
 
-  class Playlist {
+  class Playlist extends Renderable{
     
     #repeat_one_mode;
     get repeat_one_mode() {return this.#repeat_one_mode;};
@@ -315,15 +336,24 @@ this.player_worker.pause(this._playlist.current_track);
     #shuffled_order;//architectural problem with setting track, inverse array needed
 
     constructor(){ 
+      function render(){
+        console.log("playlist render");
+        let frag = new DocumentFragment();
+        frag.append(...this.tracks.map(t=>t.dom));
+        
+        return frag;
+      }
+      super(render);
+      
       this.#repeat_one_mode=false;
-      this.#repeat_list
+      this.#repeat_list=false;
 
       this.tracks=[];
 
       this.#straight_order=new Straight_play_order();//stack?
       this.#shuffled_order=new Shuffled_play_order();
      
-  this.#play_order=this.#straight_order;
+      this.#play_order=this.#straight_order;
     };
 
     add(track){
@@ -332,20 +362,14 @@ this.player_worker.pause(this._playlist.current_track);
     };
 
     get next(){
-      if(!repeat_one_mode) this.#current_track=tracks[this.#play_order.next({repeat:this.repeat_list_mode})];
+      if(!this.repeat_one_mode) this.#current_track=this.tracks[this.#play_order.next({repeat:this.repeat_list_mode})];
       return this.#current_track;
     };
     get prev(){
-      if(!repeat_one_mode) this.#current_track=tracks[this.#play_order.prev({repeat:this.repeat_list_mode})];
+      if(!this.repeat_one_mode) this.#current_track=this.tracks[this.#play_order.prev({repeat:this.repeat_list_mode})];
       return this.#current_track;
     };
 
-    attach_to_dom({parent_element}={}){
-console.log("tracks rendered");
-      for (let track of this.tracks) {
-        track.attach_to_dom({parent_element});
-      };
-    };
 
     empty(){
       return 0 === this.tracks.length;
@@ -435,28 +459,27 @@ console.log("tracks rendered");
   };//end Shuffled_play_order
 
 
-  class Track{
+  class Track extends Renderable{
     id;
     name;
     url;
+
     constructor(file){
-    this.id="";
-    this.name="";
-    this.url="";
-
-
-      this.name=file.name;
-      this.url=URL.createObjectURL(file);
-    }
-
-    attach_to_dom({parent_element}={}){
+      function render(){
 console.log("track rendered",this.name);
       let li = document.createElement("li");
       li.innerText = this.name;
-      parent_element.appendChild(li);
+      return li;
     };
 
-    //render_string(){}
+      super(render)
+      this.id="";
+      this.name=file.name;
+      this.url= URL.createObjectURL(file);
+    }
+
+    
+
 
   };//end Track
  
@@ -465,12 +488,12 @@ console.log("track rendered",this.name);
   const player_brain = new Player_controller();
 
   const push_files_to_list = files => {
-console.log("pishfi");
+console.log("push_files");
     for (let i = 0, l = files.length; i < l; ++i) {
       let file = files[i];
       player_brain.add(new Track(file));
     };
-  player_brain.attach_to_dom();
+  player_brain.dom;
   };
 
   let fileinput = document.querySelector("#fileinput");
@@ -484,6 +507,10 @@ console.log("pishfi");
     push_files_to_list(event.dataTransfer.files);
   });
 
+
+
+
+//!!!refactoring following needed!!!
 
 let [main,playlist,player] = [".main",".playlist",".player"].map(s=>document.querySelector(s).classList);
 
@@ -542,7 +569,6 @@ if(visible!==2){
 
 
 console.log("endcript")
-
 
 
     </script>

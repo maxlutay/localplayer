@@ -239,11 +239,6 @@
 
   <script defer>
 
-
-
-
-  <script defer>
-
   class Renderable{
     _fragment;
     #render_function;
@@ -549,6 +544,7 @@ let visible = 0;
 let [t1,t2]= [".player_tab_toggler",".playlist_tab_toggler"].map(s=>document.querySelector(s));
 
 t1.addEventListener("click",()=>{
+alert("t1");
   if(visible!==1){
 
     visible=1;
@@ -573,7 +569,7 @@ t1.addEventListener("click",()=>{
 });
 
 t2.addEventListener("click",()=>{
-
+alert("t2");
 if(visible!==2){
 
     visible=2;
@@ -603,7 +599,6 @@ console.log("endcript")
 
 
     </script>
-
 
 </body>
 

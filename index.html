@@ -193,7 +193,12 @@
       z-index: 100;
     }
 
-    
+    .control_button {
+       --count: 20;
+       --vleast: min(calc(var(--count)*1vw),calc(var(--count)*1vh));
+       color:red;
+       width: var(--vleast);
+    }
 
   </style>
 </head>
@@ -229,7 +234,9 @@
   
     <div class="player_tab hidden">
       
-<div class="controls">controls</div><!--controls end-->
+<div class="controls">controls
+<div class="mix_mode control_button">mix mode</div>
+</div><!--controls end-->
     <div class="player"></div>
 
     </div><!-- player_tab end-->
@@ -238,6 +245,7 @@
   </div><!-- app end -->
 
   <script defer>
+
 
   class Renderable{
     _fragment;
@@ -338,7 +346,12 @@ this.#dom_player.src = track.url;};
       };
     }
 
-    
+    mix_mode({shuffle}={}){
+      
+      console.log("mode",shuffle);
+      if(shuffle){this._playlist.shuffle();return;};
+      this._playlist.straight();
+    };
 
   };//end Player_controller
 
@@ -383,7 +396,8 @@ this.#dom_player.src = track.url;};
 
     add(track){
       let i = -1 + this.tracks.push(track);//returns length after push, which -1 is the index of new element
-      this.#play_order.add(i);
+      this.#straight_order.add(i);
+      this.#shuffled_order.add(i);
     };
 
     get next(){
@@ -395,6 +409,12 @@ this.#dom_player.src = track.url;};
       return this.#current_track;
     };
 
+    straight(){
+      this.#play_order =this.#straight_order;
+    }
+    shuffle(){
+      this.#play_order =this.#shuffled_order;
+    }
 
     empty(){
       return 0 === this.tracks.length;
@@ -568,7 +588,8 @@ t1.addEventListener("click",()=>{
 });
 
 t2.addEventListener("click",()=>{
-  if(visible!==2){
+
+if(visible!==2){
 
     visible=2;
 
@@ -590,10 +611,14 @@ t2.addEventListener("click",()=>{
   };
 });
 
-
+let shuffle = false;
+document.querySelector(".mix_mode").addEventListener("click",(e)=>{
+  shuffle = !shuffle;
+  player_brain.mix_mode({shuffle});
+e.target.innerText = `mixmode ${shuffle?"shuffle":"straight"}`;
+});
 
 console.log("endcript")
-
 
 
     </script>

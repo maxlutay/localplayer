@@ -193,11 +193,17 @@
       z-index: 100;
     }
 
+    .controls{
+      display: flex;
+      flex-direction: row;
+    }
+
     .control_button {
-       --count: 20;
-       --vleast: min(calc(var(--count)*1vw),calc(var(--count)*1vh));
-       color:red;
-       width: var(--vleast);
+      --wcount: 20;
+      --vleast: min(1vw,1vh);
+      color:red;
+      width: calc(var(--wcount)*var(--vleast));
+      padding: calc(2*var(--vleast));
     }
 
   </style>
@@ -234,9 +240,13 @@
   
     <div class="player_tab hidden">
       
-<div class="controls">controls
-<div class="mix_mode control_button">mix mode</div>
-</div><!--controls end-->
+<div class="controls">
+        <div class="mix_mode control_button">mix mode</div>
+        <div class="prev_track control_button">prev</div>
+        <div class="playpause_mode control_button">play</div>
+        <div class="next_track control_button">next</div>
+    </div><!--controls end-->
+    <div class="track_name"></div>
     <div class="player"></div>
 
     </div><!-- player_tab end-->
@@ -246,18 +256,17 @@
 
   <script defer>
 
-
   class Renderable{
-    _fragment;
+    #fragment;
     #render_function;
     constructor(renderfn){
-      this._fragment = new DocumentFragment();
+      this.#fragment = new DocumentFragment();
       this.#render_function = renderfn;
     };
     get dom(){
       let d = this.#render_function();
-      if(d){this._fragment.append(d);};
-      return this._fragment;
+      if(d){this.#fragment.append(d);};
+      return this.#fragment;
     };
   }
 
@@ -267,6 +276,7 @@
     #onplayend;
 
 
+
     constructor(){
       function render(){
         console.log("render worker");
@@ -274,26 +284,39 @@
       }
       super(render);
       this.#dom_player = document.createElement("audio");
-      this.#dom_player.controls = "controls";
-      
+      this.#dom_player.controls = true;
+      this.#dom_player.crossOrigin = "anonymous";
     };
 
 
     play(track){
-console.log("play", track);
-      this.#dom_player.src = track.url;
+      if(track){ this.#dom_player.src = track.url;};
       this.#dom_player.play();
-      return true;
+      return true;//Y?
     };
     
-    pause(track){
-console.log("pause", track);
+    pause(){
       this.#dom_player.pause();
+      return;//Y?
+    };
+
+
+    set_track(track){
       if(track){ 
-console.log("setsrc");
-this.#dom_player.src = track.url;};
-      this.#dom_player.pause();
-      return true;
+document.querySelector(".track_name").innerText = JSON.stringify(track);
+
+       let was_paused = this.#dom_player.paused;
+
+        this.#dom_player.src = track.url;
+
+        if(was_paused){
+          this.pause();
+        }else{ 
+          this.play()
+        };
+        return true;
+      };
+      return false;
     };
 
     set play_end_callback(cb){
@@ -319,28 +342,32 @@ this.#dom_player.src = track.url;};
       function render(){
         console.log("controller rendered");
         let player_parent = document.querySelector(".player");
- 
         player_parent.replaceChildren(); 
         player_parent.appendChild( this.player_worker.dom);
         let tracks_parent = document.querySelector(".tracks");
         tracks_parent.replaceChildren();
         tracks_parent.appendChild( this._playlist.dom);
-    };
+      };
 
       super(render);
 
       this.player_worker = new Player_worker();
       this._playlist = new Playlist();
-      this.player_worker.play_end_callback = ()=>this.player_worker.play(this._playlist.next);
       
-      this.dom;
+      this.player_worker .play_end_callback = ()=>{
+        this.player_worker .set_track(this._playlist.next)
+        this.player_worker.play();
+      };
+      
+      //this.dom;
     };
 
 
     add(tr){
-      if(this._playlist.empty()){
+      if(this._playlist.empty){
         this._playlist.add(tr);
-        this.player_worker.pause(this._playlist.next);
+        this.player_worker .set_track(this._playlist.next);
+        this.player_worker.pause();
       }else{
         this._playlist.add(tr);
       };
@@ -351,6 +378,25 @@ this.#dom_player.src = track.url;};
       console.log("mode",shuffle);
       if(shuffle){this._playlist.shuffle();return;};
       this._playlist.straight();
+    };
+
+    play({track}={}){
+//what if track is not in playlist
+      this.player_worker .set_track(track);
+      this.player_worker.play();
+    };
+
+    pause({track}={}){
+      this.player_worker .set_track(track);
+      this.player_worker.pause();
+    };
+
+
+    go_prev_track(){
+      this.player_worker.set_track( this._playlist.prev);
+    };
+    go_next_track(){
+      this.player_worker.set_track( this._playlist.next);
     };
 
   };//end Player_controller
@@ -416,7 +462,7 @@ this.#dom_player.src = track.url;};
       this.#play_order =this.#shuffled_order;
     }
 
-    empty(){
+    get empty(){
       return 0 === this.tracks.length;
     };
 
@@ -561,7 +607,7 @@ let [main,playlist,player] = [".main_tab",".playlist_tab",".player_tab"].map(s=>
 
 let visible = 0;
 
-let [t1,t2]= [".player_tab_toggler",".playlist_tab_toggler"].map(s=>document.querySelector(s));
+const [t1,t2]= [".player_tab_toggler",".playlist_tab_toggler"].map(s=>document.querySelector(s));
 
 t1.addEventListener("click",()=>{
   if(visible!==1){
@@ -615,10 +661,35 @@ let shuffle = false;
 document.querySelector(".mix_mode").addEventListener("click",(e)=>{
   shuffle = !shuffle;
   player_brain.mix_mode({shuffle});
-e.target.innerText = `mixmode ${shuffle?"shuffle":"straight"}`;
+e.target.innerText = `mix mode  ${shuffle?"shuffle":"straight"}`;
 });
 
-console.log("endcript")
+
+let [play,pause]= [false,true];
+document.querySelector(".playpause_mode").addEventListener("click",(e)=>{
+  [play,pause]=[!play,!!play];
+  if(play){player_brain.play(); };
+  if(pause){player_brain.pause();};
+  e.target.innerText = play ? "pause" : "play";
+});
+
+//document.querySelector(".track_name");
+
+
+const [go_prev, go_next] = [".prev_track",".next_track"].map(s=>document.querySelector(s));
+
+go_prev.addEventListener("click",()=>{
+  player_brain.go_prev_track();
+  console.log("prev");
+});
+go_next.addEventListener("click",()=>{
+  player_brain.go_next_track();
+  console.log("next");
+});
+
+
+console.log("end_script")
+
 
 
     </script>

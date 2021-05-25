@@ -113,19 +113,14 @@
     .tabs{
       position: absolute;
       top: 0;
-      width:100%;
+      width:100vw;
       height: var(--tabs-height);
-      max-height: var(--tabs-height);
-
-
     }
  
     .tabs>*{
       position: absolute;
-
-      height: 100%;
-      width: 100%;
-      max-height: var(--tabs-height);
+      width: 100vw;
+      height: var(--tabs-height);
 
     }
 
@@ -138,7 +133,7 @@
       background: var(--playlist_tab_background);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: stretch;
     }
     
@@ -193,17 +188,36 @@
       z-index: 100;
     }
 
-    .controls{
-      display: flex;
-      flex-direction: row;
+    .track_name{
+      overflow:scroll;
     }
 
+    .playlist_tab .controls{
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-items: stretch;
+      min-height: 14vh;
+    }
+
+    .player_tab .controls{
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+
     .control_button {
+      display: block;
       --wcount: 20;
       --vleast: min(1vw,1vh);
       color:red;
       width: calc(var(--wcount)*var(--vleast));
       padding: calc(2*var(--vleast));
+      
     }
 
   </style>
@@ -236,25 +250,29 @@
           <button>Add remote url track</button>
         </div>
       </div><!-- add_file end -->
+
+      <div class="controls">
+        <div class="mix_mode control_button">order: straight</div>
+      </div>
     </div><!-- playlist end -->
   
     <div class="player_tab hidden">
       
-<div class="controls">
-        <div class="mix_mode control_button">mix mode</div>
+
+      <div class="track_name"></div>
+      <div class="player"></div>
+      <div class="controls">
         <div class="prev_track control_button">prev</div>
         <div class="playpause_mode control_button">play</div>
         <div class="next_track control_button">next</div>
-    </div><!--controls end-->
-    <div class="track_name"></div>
-    <div class="player"></div>
-
+      </div><!--controls end-->
     </div><!-- player_tab end-->
   </div><!-- tabs end -->
   
   </div><!-- app end -->
 
   <script defer>
+
 
   class Renderable{
     #fragment;
@@ -279,7 +297,7 @@
 
     constructor(){
       function render(){
-        console.log("render worker");
+        //console.log("render worker");
         return this.#dom_player;
       }
       super(render);
@@ -303,7 +321,7 @@
 
     set_track(track){
       if(track){ 
-document.querySelector(".track_name").innerText = JSON.stringify(track);
+document.querySelector(".track_name").innerText = JSON.stringify(track).replace(/\,/g,", ");
 
        let was_paused = this.#dom_player.paused;
 
@@ -339,17 +357,28 @@ document.querySelector(".track_name").innerText = JSON.stringify(track);
     _playlist;
 
     constructor(){
+
+
       function render(){
-        console.log("controller rendered");
-        let player_parent = document.querySelector(".player");
-        player_parent.replaceChildren(); 
-        player_parent.appendChild( this.player_worker.dom);
-        let tracks_parent = document.querySelector(".tracks");
-        tracks_parent.replaceChildren();
-        tracks_parent.appendChild( this._playlist.dom);
+        //console.log("controller rendered");
+        this.tracks_render();
+        this.player_render();
       };
 
       super(render);
+
+      this.tracks_render = ()=>{
+        let parent = document.querySelector(".tracks");
+        parent.replaceChildren();
+        parent.appendChild( this._playlist.dom);
+      };
+
+      this.player_render = ()=>{
+        let parent = document.querySelector(".player");
+        parent.replaceChildren(); 
+        parent.appendChild( this.player_worker.dom);
+      };//todo eliminte duplication
+
 
       this.player_worker = new Player_worker();
       this._playlist = new Playlist();
@@ -375,9 +404,13 @@ document.querySelector(".track_name").innerText = JSON.stringify(track);
 
     mix_mode({shuffle}={}){
       
-      console.log("mode",shuffle);
-      if(shuffle){this._playlist.shuffle();return;};
-      this._playlist.straight();
+      //console.log("mode",shuffle);
+      if(shuffle){
+        this._playlist.shuffle();
+      } else {
+        this._playlist.straight();
+      };
+      this.tracks_render();
     };
 
     play({track}={}){
@@ -421,10 +454,11 @@ document.querySelector(".track_name").innerText = JSON.stringify(track);
 
     constructor(){ 
       function render(){
-        console.log("playlist render");
+        //console.log("playlist render");
         let frag = new DocumentFragment();
-        frag.append(...this.tracks.map(t=>t.dom));
-        
+        //frag.append(...this.tracks.map(t=>t.dom));//old
+        const ts= this.#play_order._container.map(i=>this.tracks[i].dom);
+        frag.append(...ts);
         return frag;
       }
       super(render);
@@ -437,7 +471,7 @@ document.querySelector(".track_name").innerText = JSON.stringify(track);
       this.#straight_order=new Straight_play_order();//stack?
       this.#shuffled_order=new Shuffled_play_order();
      
-      this.#play_order=this.#straight_order;
+      this.#play_order= this.#straight_order;
     };
 
     add(track){
@@ -456,10 +490,16 @@ document.querySelector(".track_name").innerText = JSON.stringify(track);
     };
 
     straight(){
+      let i = this.#play_order.current_i;
       this.#play_order =this.#straight_order;
+      this.#play_order.set_current(i);
+      //console.log(`stra ${i}_>${this.#play_order.current_i}`);
     }
     shuffle(){
+      let i = this.#play_order.current_i;
       this.#play_order =this.#shuffled_order;
+      this.#play_order.set_current(i);
+      //console.log(`shuf ${i}_>${this.#play_order.current_i}`);
     }
 
     get empty(){
@@ -470,6 +510,7 @@ document.querySelector(".track_name").innerText = JSON.stringify(track);
  
   class Play_order {
     _current_i;
+    get current_i(){return this._current_i;};
     _container;
     constructor(){
       this._current_i = 0;
@@ -508,15 +549,25 @@ document.querySelector(".track_name").innerText = JSON.stringify(track);
       throw new Error("not implemented");
     };
 
-    add(track){
+    add(index_of_track){
       throw new Error("not implemented");
     };
     
+    is_valid_index(i){
+      return 0<=i && i < this._container.length;
+    };
+    set_current(i){
+      if(this.is_valid_index(i)){
+        this._current_i=i;
+      };
+    };
   };//end Play_order
 
 
   class Straight_play_order extends Play_order{
     constructor(){super();};
+    
+    
     fill_from(order){
       this._container=Array.from(order);
     };
@@ -528,15 +579,21 @@ document.querySelector(".track_name").innerText = JSON.stringify(track);
 
   class Shuffled_play_order extends Play_order{
     inversed_order;
-    constructor(){super();};
+    constructor(){
+      super();
+      this.inversed_order=[];
+    
+    };
 
+    get current_i(){return this._container[this._current_i];};
+    
     fill_from(order){
       const c=Array.from(order);
 
       for (let i = c.length-1;i >=0;--i){
         const random_index = Math.round(Math.random()*i);
         c[i]=c[random_index];
-        inversed_order[random_index]=inversed_order[i];//experimental
+        this.inversed_order[random_index]= i;//experimental
       };
       this._container = c;
     };
@@ -544,7 +601,19 @@ document.querySelector(".track_name").innerText = JSON.stringify(track);
     add(w){
       const max_i = this._container.length-1;
       const random_index = Math.round(Math.random()*max_i);
+
       this._container.splice(random_index,0,w);//bevare the complexity=O(n)
+
+      //this.inversed_order[w]= random_index;//wrong cause splice index invalidation
+      this.inversed_order.length++;
+      this._container.forEach((v,k)=>{this.inversed_order[v]=k;});//experimental
+    };
+
+    set_current(i){
+      if(this.is_valid_index(i)){
+        console.log(i, this._current_i, this._container,this.inversed_order )
+        this._current_i= this.inversed_order[i];
+      };
     };
 
   };//end Shuffled_play_order
@@ -557,7 +626,7 @@ document.querySelector(".track_name").innerText = JSON.stringify(track);
 
     constructor(file){
       function render(){
-console.log("track rendered",this.name);
+//console.log(`track rendered: ${this.name}`);
       let li = document.createElement("li");
       li.innerText = this.name;
       return li;
@@ -661,7 +730,7 @@ let shuffle = false;
 document.querySelector(".mix_mode").addEventListener("click",(e)=>{
   shuffle = !shuffle;
   player_brain.mix_mode({shuffle});
-e.target.innerText = `mix mode  ${shuffle?"shuffle":"straight"}`;
+e.target.innerText = `order: ${shuffle?"shuffle":"straight"}`;
 });
 
 
@@ -680,16 +749,15 @@ const [go_prev, go_next] = [".prev_track",".next_track"].map(s=>document.querySe
 
 go_prev.addEventListener("click",()=>{
   player_brain.go_prev_track();
-  console.log("prev");
+  //console.log("prev");
 });
 go_next.addEventListener("click",()=>{
   player_brain.go_next_track();
-  console.log("next");
+  //console.log("next");
 });
 
 
 console.log("end_script")
-
 
 
     </script>

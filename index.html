@@ -7,121 +7,168 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>localplayer</title>
   <style>
-     body, body * {
+     * {
       margin: 0;         
       padding: 0;
       border: 0;
       outline: 0;
       box-sizing: border-box;
-    
-      border: 1px dashed darkslategray;
+
+      
     }
-    
+
+
+    /*html{
+      height: 100vh;
+      height: -webkit-fill-available;
+      height: fill-available;
+    }*/
 
     body {
       width: 100vw;
       height: 100vh;
-      max-width: 100%;
-    }
-   
-    .add_file {
-      
-      height: 15vh;
-      width: 100%;
+      /*height: -webkit-fill-available;
+      height: fill-available;
+*/
+      overscroll-behavior: none;
 
-
-      display: flex;
-      flex-direction: row; 
-      justify-content: space-between;
-      align-items: stretch;
-    }
-
-    
-
-    #fileinput_container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width:50%;
-      height: 100%;
-      position: relative;
-   }
-
-   #fileinput {
-      width:100%;
-      height: 100%;
-      z-index:50;
-      opacity: 0;
       position: absolute;
+      left:0;
+      top:0;
     }
 
+
+
+    .app{
+      width: 100vw;
+      height: 100vh;
+
+      /*background: cyan;*/
+      position: absolute;
+      left:0;
+      top:0;
+
+    }
+
+
+
+   
     
     audio{
       width: 100%;
     }
 
-    .app{
-      width: 100vw;
-      height: 100vh;
-      background: cyan;
-      position: relative;
-    }
+
 
     :root{
-      --footer-height: 15vh;
-      --tabs-height: calc(100vh - var(--footer-height)); 
+      --footer_height: 18vh;
+  
+      --tabs_height: calc(100vh - var(--footer_height)); 
 
-      --header-height: 15%; 
-      --feed-height: 85%; 
+
+
+      --header_height: 15%; 
+      --feed_height: 85%; 
     }
 
 
     :root{
-      --player_tab_background: lavender;
-      --main_tab_background: lemonchiffon;
-      --playlist_tab_background : mintcream;
+      --player_tab_background: #e6e6fa;
+      --main_tab_background: #f9f5d7;
+      --playlist_tab_background: #d7f9f5;
     }
 
 
     .footer{
       width:100%;
-      height: var(--footer-height);
+      height: var(--footer_height);
       position: absolute;
-      bottom:0;
 
+      bottom:0;
+      left:0;
+
+
+      --footer_padding: 2vh;
+      padding: var(--footer_padding) 
+ 0 var(--footer_padding) 0;
+
+      
       display:flex;
       flex-direction: row;
-      justify-content: space-between;
-      align-items: stretch;
+      justify-content: space-around;
+      align-items: center;
       background: var(--main_tab_background);
+
+
+     border: 1px solid white;
     }
 
+
+    .footer>* {
+      
+      width: 100%;
+      height: 100%;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+
+      --bd_rad: calc(var(--footer_height) /2 - var(--footer_padding));
+    }
+
+    .footer>* icon{
+      background: white;
+      --rval: calc(var(--footer_height)/16);
+      --brval: var(--rval);
+      border-radius: var(--brval);
+      overflow: hidden;
+
+
+      --pval: 1vh;
+      padding: var(--pval);
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      --toggler_size: calc(var(--footer_height) - 2*var(--footer_padding));
+      height: var(--toggler_size);
+      width: var(--toggler_size);
+    };
     .player_tab_toggler{
-       width:50%;
      }
     .playlist_tab_toggler{
-       width:50%;
      }
 
     .player_tab_toggler.active {
       background: var(--player_tab_background);
+
+       border-radius: var(--bd_rad) 0 0 var(--bd_rad);
     }
     .playlist_tab_toggler.active {
       background: var(--playlist_tab_background);
+      border-radius: 0 var(--bd_rad) var(--bd_rad) 0 ;
     }
     
     .tabs{
       position: absolute;
       top: 0;
+      left:0;
       width:100vw;
-      height: var(--tabs-height);
+      height: var(--tabs_height);
+
     }
  
     .tabs>*{
       position: absolute;
       width: 100vw;
-      height: var(--tabs-height);
+      height: var(--tabs_height);
 
+      top: 0;
+      left:0;
+
+      visibility: hidden;
     }
 
     .main_tab{
@@ -144,16 +191,18 @@
     
     
     .header{
-      height: var(--header-height);
+      height: var(--header_height);
       
     }
 
    
     .feed{
-      height: var(--feed-height);;
+      height: var(--feed_height);;
+      width: 100%;
 
       flex-direction: column;
       overflow-x: scroll;
+
     }
 
     .feed .section{
@@ -161,22 +210,123 @@
     }
 
    
-  
+  .add_file {
+      
+      height: var(--tabs_height);
+      width: 100%;
+
+
+      display: flex;
+      flex-direction: column; 
+      justify-content: space-around;
+      align-items: center;
+
+      position: absolute;
+      top:0;
+      left:0;
+
+
+      background: rgba(150,150,150,0.5);
+border: 1px dotted darkslategray;
+    }
+
+    .add_file.hidden{
+      visibility: hidden;
+      z-index: -2;
+    }
+
+    .add_file.visible{
+      visibility: visible;
+      z-index: 60;
+    }
+    
+
+    .add_file .close{
+     color: white;
+     background: red;
+ /*    position: absolute;
+     bottom: 10vh;
+     left: 40%;
+     rigth: 40%;
+*/
+     width: 20%;
+
+     text-align: center;
+
+     padding: 1vh;
+    }
+
+    .add_file>*{
+    background: white;
+   border: 1px solid black;
+    }
+
+    .fileinput_container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width:80%;
+      height: 15vh;
+      position: relative;
+      
+   }
+
+   #fileinput {
+      width:100%;
+      height: 15vh;
+      z-index:50;
+      opacity: 0;
+      position: absolute;
+    }
+
+    .urlinput_container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width:80%;
+      min-height: 15vh;
+    }
+
+    .urlinput_container>*{
+      max-width: 80%;
+    }
+
+    #urlinput {
+      height: 100%;
+      font-size: 8vh;
+    }
 
     .tracks {
       width: 100%;
+      height: 100%;
       overflow-y: scroll;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
+      align-items: center;
     }
 
     .tracks>li {
+      display: block;
       width: 100%;
-      min-height: fit-content;
-      
-    }
+      height: 10vh;
+   }
 
+    .tracks>li::after {
+      width:90%;
+      left: 5%;
+      height: 1px;
+      position: relative;
+      content:"";
+      display: block;
+      background: white;
+    }
+   .tracks li div {
+      overflow-x: scroll;
+      padding: 2vh;
+      white-space: nowrap;
+    }
 
     .hidden{
       visibility: hidden;
@@ -196,15 +346,15 @@
       display: flex;
       flex-direction: row;
       flex-wrap: nowrap;
-      justify-content: space-between;
-      align-items: stretch;
-      min-height: 14vh;
+      justify-content: space-around;
+      align-items: center;
+      height: 14vh;
     }
 
     .player_tab .controls{
       display: flex;
       flex-direction: row;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       justify-content: space-around;
       align-items: center;
     }
@@ -212,13 +362,34 @@
 
     .control_button {
       display: block;
-      --wcount: 20;
+      --wcount: 15;
       --vleast: min(1vw,1vh);
       color:red;
-      width: calc(var(--wcount)*var(--vleast));
+      --size: calc(var(--wcount)*var(--vleast));
+      width: var(--size);
+      height: var(--size);
+      
       padding: calc(2*var(--vleast));
       
+      background: white;
+      /*word-wrap: break-word;*/
+      overflow: hidden;
     }
+
+
+
+
+    .tracks  .current {
+      background: darkgrey;
+    };
+
+    .player{
+      background: red;
+    };
+
+
+
+
 
   </style>
 </head>
@@ -227,8 +398,8 @@
   <div class="app">
  
   <nav class="footer">
-    <div class="playlist_tab_toggler">playlist</div>
-    <div class="player_tab_toggler">player</div>
+    <div class="playlist_tab_toggler"><icon>playlist</icon></div>
+    <div class="player_tab_toggler"><icon>player</icon></div>
   </nav><!-- footer end -->
 
   <div class="tabs">
@@ -239,20 +410,25 @@
     <div class="playlist_tab hidden">
       <ul class="tracks">tracks</ul><!-- tracks end -->
       
-      <div class="add_file">
-        <div id="fileinput_container">
-          <input type="file" multiple  accept="audio/*, video/*" id="fileinput" name="fileinput" />
-          <label for="fileinput" id="fileinput_label">Add local track</label>
-        </div>
-        <div id="urlinput_container">
-          <input type="url" id="urlinput" name="urlinput">
+      <div class="add_file hidden">
+
+        <div class="urlinput_container">
+          <input type="url" id="urlinput" name="urlinput" placeholder="url">
           <label for="urlinput">audio <span>not</span> exists</label>
           <button>Add remote url track</button>
         </div>
+        <div class="fileinput_container">
+          <input type="file" multiple  accept="audio/*, video/*" id="fileinput" name="fileinput" />
+          <label for="fileinput" id="fileinput_label">Add local tracks</label>
+        </div>
+        <div class="close">close</div>
       </div><!-- add_file end -->
-
       <div class="controls">
-        <div class="mix_mode control_button">order: straight</div>
+        <div class="show_add_file control_button">+</div>
+      </div>
+      <div class="controls">
+        <div class="mix_mode control_button">shuffled</div>
+       
       </div>
     </div><!-- playlist end -->
   
@@ -272,7 +448,6 @@
   </div><!-- app end -->
 
   <script defer>
-
 
   class Renderable{
     #fragment;
@@ -339,7 +514,7 @@ document.querySelector(".track_name").innerText = JSON.stringify(track).replace(
 
     set play_end_callback(cb){
      const t = this;
-     if(t.#onplayend) this.#dom_player.removeEventListener(t.#onplayend);
+     if(t.#onplayend) this.#dom_player.removeEventListener("ended",t.#onplayend);
      t.#onplayend = cb;
      if(cb) this.#dom_player.addEventListener("ended", t.#onplayend);
     };
@@ -383,9 +558,13 @@ document.querySelector(".track_name").innerText = JSON.stringify(track).replace(
       this.player_worker = new Player_worker();
       this._playlist = new Playlist();
       
-      this.player_worker .play_end_callback = ()=>{
-        this.player_worker .set_track(this._playlist.next)
+      this.player_worker.play_end_callback = ()=>{
+        this.player_worker.set_track(this._playlist.next)
         this.player_worker.play();
+      };
+
+      this._playlist.after_track_set_callback = ()=>{
+        this.player_worker.set_track(this._playlist.current_track);
       };
       
       //this.dom;
@@ -445,8 +624,19 @@ document.querySelector(".track_name").innerText = JSON.stringify(track).replace(
 
     #current_track;
     get current_track(){return this.#current_track;};
-    //set current_track(t_i){};//TODO!!!!!rearranging
 
+    set #current_track_i(t_i){
+      this.#play_order.set_current(t_i);
+      this.#current_track= this.tracks[t_i];
+      if(this.after_track_set_callback){ 
+        this.after_track_set_callback();
+      };
+    };//TODO!!!!!rearranging
+
+    after_track_set_callback;
+    #current_track_dom;
+                            
+                            
     tracks;
     #play_order;//ref to other array
     #straight_order;//stack?
@@ -455,9 +645,22 @@ document.querySelector(".track_name").innerText = JSON.stringify(track).replace(
     constructor(){ 
       function render(){
         //console.log("playlist render");
+        
         let frag = new DocumentFragment();
-        //frag.append(...this.tracks.map(t=>t.dom));//old
-        const ts= this.#play_order._container.map(i=>this.tracks[i].dom);
+
+        let click_track_callback = i =>(e)=>{
+          console.log("click track");
+          this.#current_track_dom?.classList.remove("current");
+          this.#current_track_i=i;
+          this.#current_track_dom = e.target;
+          e.target.classList.add("current");
+          
+        };
+        const ts= this.#play_order._container.map(i=>{
+          let t = this.tracks[i];
+          t.click_callback = click_track_callback(i);
+          return t.dom;
+        });
         frag.append(...ts);
         return frag;
       }
@@ -471,7 +674,7 @@ document.querySelector(".track_name").innerText = JSON.stringify(track).replace(
       this.#straight_order=new Straight_play_order();//stack?
       this.#shuffled_order=new Shuffled_play_order();
      
-      this.#play_order= this.#straight_order;
+      this.#play_order= this.#shuffled_order;
     };
 
     add(track){
@@ -481,10 +684,12 @@ document.querySelector(".track_name").innerText = JSON.stringify(track).replace(
     };
 
     get next(){
+      
       if(!this.repeat_one_mode) this.#current_track=this.tracks[this.#play_order.next({repeat:this.repeat_list_mode})];
       return this.#current_track;
     };
     get prev(){
+      
       if(!this.repeat_one_mode) this.#current_track=this.tracks[this.#play_order.prev({repeat:this.repeat_list_mode})];
       return this.#current_track;
     };
@@ -494,7 +699,7 @@ document.querySelector(".track_name").innerText = JSON.stringify(track).replace(
       this.#play_order =this.#straight_order;
       this.#play_order.set_current(i);
       //console.log(`stra ${i}_>${this.#play_order.current_i}`);
-    }
+    }m
     shuffle(){
       let i = this.#play_order.current_i;
       this.#play_order =this.#shuffled_order;
@@ -600,7 +805,7 @@ document.querySelector(".track_name").innerText = JSON.stringify(track).replace(
 
     add(w){
       const max_i = this._container.length-1;
-      const random_index = Math.round(Math.random()*max_i);
+      const random_index = Math.round(Math.random()*max_i); // normal distribution, probability of insertion to middle higher which is  incorrect , flat needed, maybe full reshuffle
 
       this._container.splice(random_index,0,w);//bevare the complexity=O(n)
 
@@ -624,11 +829,19 @@ document.querySelector(".track_name").innerText = JSON.stringify(track).replace(
     name;
     url;
 
+    #dom;
+
     constructor(file){
       function render(){
 //console.log(`track rendered: ${this.name}`);
-      let li = document.createElement("li");
-      li.innerText = this.name;
+      let li = this.#dom;
+      li = document.createElement("li");
+
+      li.addEventListener("click", this.#click_callback);
+
+      let div = document.createElement("div");
+      div.innerText = this.name;
+      li.append(div);
       return li;
     };
 
@@ -638,7 +851,16 @@ document.querySelector(".track_name").innerText = JSON.stringify(track).replace(
       this.url= URL.createObjectURL(file);
     }
 
+    #click_callback;
+    set click_callback(fn){
+        if(fn){
+          if(this.#dom) this.#dom.removeEventListener("click", this.#click_callback);
+          this.#click_callback = fn;
+        };
+    };
+
     
+
 
 
   };//end Track
@@ -726,11 +948,11 @@ if(visible!==2){
   };
 });
 
-let shuffle = false;
+let shuffle = true;
 document.querySelector(".mix_mode").addEventListener("click",(e)=>{
   shuffle = !shuffle;
   player_brain.mix_mode({shuffle});
-e.target.innerText = `order: ${shuffle?"shuffle":"straight"}`;
+e.target.innerText = ` ${shuffle?"shuffle":"straight"}`;
 });
 
 
@@ -757,7 +979,29 @@ go_next.addEventListener("click",()=>{
 });
 
 
+let file_add = document.querySelector(".add_file");
+let closed=true;
+
+
+let show_add_file = document.querySelector(".show_add_file");
+show_add_file.addEventListener("click", (e)=>{
+  file_add.classList.add("visible");
+  file_add.classList.remove("hidden");
+  closed=false;
+  show_add_file.classList .add("hidden");
+  show_add_file.classList .remove("visible");
+});
+
+document.querySelector(".add_file .close").addEventListener("click",(e)=>{
+  file_add.classList.add("hidden");
+  file_add.classList.remove("visible");
+  closed=true;;
+  show_add_file.classList .add("visible");
+  show_add_file.classList .remove("hidden");
+});
+
 console.log("end_script")
+
 
 
     </script>

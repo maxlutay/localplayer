@@ -499,7 +499,7 @@ border: 1px dotted darkslategray;
       if(track){ 
 document.querySelector(".track_name").innerText = JSON.stringify(track).replace(/\,/g,", ");
 
-       navigator.mediaSession.metadata = new MediaMetadata({
+       navigator?.mediaSession?.metadata = new MediaMetadata({
        title: track.name
        });
 

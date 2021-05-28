@@ -449,6 +449,7 @@ border: 1px dotted darkslategray;
 
   <script defer>
 
+  
   class Renderable{
     #fragment;
     #render_function;
@@ -497,6 +498,10 @@ border: 1px dotted darkslategray;
     set_track(track){
       if(track){ 
 document.querySelector(".track_name").innerText = JSON.stringify(track).replace(/\,/g,", ");
+
+       navigator.mediaSession.metadata = new MediaMetadata({
+       title: track.name
+       });
 
        let was_paused = this.#dom_player.paused;
 
@@ -999,6 +1004,27 @@ document.querySelector(".add_file .close").addEventListener("click",(e)=>{
   show_add_file.classList .add("visible");
   show_add_file.classList .remove("hidden");
 });
+
+
+
+navigator?.mediaSession?.setActionHandler('play', function() {
+  player_brain.play();
+  [play,pause]=[true,false];
+});
+
+navigator?.mediaSession?.setActionHandler('pause', function() {
+  player_brain.pause();
+  [play,pause]=[false,true];
+});
+  
+navigator?.mediaSession?.setActionHandler('previoustrack', function() {
+  player_brain.go_prev_track();
+});
+
+navigator?.mediaSession?.setActionHandler('nexttrack', function() {
+  player_brain.go_next_track();
+});
+
 
 console.log("end_script")
 

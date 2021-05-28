@@ -1,166 +1,883 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>localplayer</title>
   <style>
-    body,
-    body * {
+     * {
       margin: 0;         
       padding: 0;
       border: 0;
       outline: 0;
       box-sizing: border-box;
+
+      
     }
+
+
+    /*html{
+      height: 100vh;
+      height: -webkit-fill-available;
+      height: fill-available;
+    }*/
 
     body {
       width: 100vw;
       height: 100vh;
-      max-width: 100%;
-      background: sandybrown;
+      /*height: -webkit-fill-available;
+      height: fill-available;
+*/
+      overscroll-behavior: none;
+
+      position: absolute;
+      left:0;
+      top:0;
+    }
+
+
+
+    .app{
+      width: 100vw;
+      height: 100vh;
+
+      /*background: cyan;*/
+      position: absolute;
+      left:0;
+      top:0;
+
+    }
+
+
+
+   
+    
+    audio{
+      width: 100%;
+    }
+
+
+
+    :root{
+      --footer_height: 18vh;
+  
+      --tabs_height: calc(100vh - var(--footer_height)); 
+
+
+
+      --header_height: 15%; 
+      --feed_height: 85%; 
+    }
+
+
+    :root{
+      --player_tab_background: #e6e6fa;
+      --main_tab_background: #f9f5d7;
+      --playlist_tab_background: #d7f9f5;
+    }
+
+
+    .footer{
+      width:100%;
+      height: var(--footer_height);
+      position: absolute;
+
+      bottom:0;
+      left:0;
+
+
+      --footer_padding: 2vh;
+      padding: var(--footer_padding) 
+ 0 var(--footer_padding) 0;
+
+      
+      display:flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      background: var(--main_tab_background);
+
+
+     border: 1px solid white;
+    }
+
+
+    .footer>* {
+      
+      width: 100%;
+      height: 100%;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+
+      --bd_rad: calc(var(--footer_height) /2 - var(--footer_padding));
+    }
+
+    .footer>* icon{
+      background: white;
+      --rval: calc(var(--footer_height)/16);
+      --brval: var(--rval);
+      border-radius: var(--brval);
+      overflow: hidden;
+
+
+      --pval: 1vh;
+      padding: var(--pval);
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      --toggler_size: calc(var(--footer_height) - 2*var(--footer_padding));
+      height: var(--toggler_size);
+      width: var(--toggler_size);
+    };
+    .player_tab_toggler{
+     }
+    .playlist_tab_toggler{
+     }
+
+    .player_tab_toggler.active {
+      background: var(--player_tab_background);
+
+       border-radius: var(--bd_rad) 0 0 var(--bd_rad);
+    }
+    .playlist_tab_toggler.active {
+      background: var(--playlist_tab_background);
+      border-radius: 0 var(--bd_rad) var(--bd_rad) 0 ;
+    }
+    
+    .tabs{
+      position: absolute;
+      top: 0;
+      left:0;
+      width:100vw;
+      height: var(--tabs_height);
+
+    }
+ 
+    .tabs>*{
+      position: absolute;
+      width: 100vw;
+      height: var(--tabs_height);
+
+      top: 0;
+      left:0;
+
+      visibility: hidden;
+    }
+
+    .main_tab{
+      background: var(--main_tab_background);
+    }
+
+    .playlist_tab{
+
+      background: var(--playlist_tab_background);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: stretch;
     }
+    
+    .player_tab{
+      background: var(--player_tab_background);
+    }
+
+    
+    
+    .header{
+      height: var(--header_height);
+      
+    }
+
    
-    .topping {
-      background-color: lightgreen;
-      height: 15vh;
+    .feed{
+      height: var(--feed_height);;
       width: 100%;
-;
 
-      display: flex;
-      flex-display: row; 
-      justify-content: center;
-      align-items: center;
+      flex-direction: column;
+      overflow-x: scroll;
+
     }
 
-    .topping >*{
-      border: 1px dashed darkslategray;
+    .feed .section{
+      width: 100%;
     }
 
-    #fileinput_container {
+   
+  .add_file {
+      
+      height: var(--tabs_height);
+      width: 100%;
+
+
+      display: flex;
+      flex-direction: column; 
+      justify-content: space-around;
+      align-items: center;
+
+      position: absolute;
+      top:0;
+      left:0;
+
+
+      background: rgba(150,150,150,0.5);
+border: 1px dotted darkslategray;
+    }
+
+    .add_file.hidden{
+      visibility: hidden;
+      z-index: -2;
+    }
+
+    .add_file.visible{
+      visibility: visible;
+      z-index: 60;
+    }
+    
+
+    .add_file .close{
+     color: white;
+     background: red;
+ /*    position: absolute;
+     bottom: 10vh;
+     left: 40%;
+     rigth: 40%;
+*/
+     width: 20%;
+
+     text-align: center;
+
+     padding: 1vh;
+    }
+
+    .add_file>*{
+    background: white;
+   border: 1px solid black;
+    }
+
+    .fileinput_container {
       display: flex;
       justify-content: center;
       align-items: center;
-      width:50%;
-      height: 100%;
+      width:80%;
+      height: 15vh;
       position: relative;
+      
    }
 
    #fileinput {
       width:100%;
-      height: 100%;
-      z-index:100;
+      height: 15vh;
+      z-index:50;
       opacity: 0;
       position: absolute;
     }
 
-    #tracks {
-      width: 100%;
-      max-height: 70vh;
-      overflow-x: scroll;
-      background-color: lightcyan;
+    .urlinput_container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width:80%;
+      min-height: 15vh;
     }
 
-    #tracks>li {
+    .urlinput_container>*{
+      max-width: 80%;
+    }
+
+    #urlinput {
+      height: 100%;
+      font-size: 8vh;
+    }
+
+    .tracks {
+      width: 100%;
+      height: 100%;
+      overflow-y: scroll;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .tracks>li {
+      display: block;
       width: 100%;
       height: 10vh;
-      display: flex;
-      justify-content: start;
+   }
+
+    .tracks>li::after {
+      width:90%;
+      left: 5%;
+      height: 1px;
+      position: relative;
+      content:"";
+      display: block;
+      background: white;
+    }
+   .tracks li div {
+      overflow-x: scroll;
+      padding: 2vh;
+      white-space: nowrap;
     }
 
-    audio{
-      width: 100%;
-      height: 15vh;
+    .hidden{
+      visibility: hidden;
+      z-index: 0;
     }
+
+    .visible {
+      visibility: visible;
+      z-index: 100;
+    }
+
+    .track_name{
+      overflow:scroll;
+    }
+
+    .playlist_tab .controls{
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-around;
+      align-items: center;
+      height: 14vh;
+    }
+
+    .player_tab .controls{
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+
+    .control_button {
+      display: block;
+      --wcount: 15;
+      --vleast: min(1vw,1vh);
+      color:red;
+      --size: calc(var(--wcount)*var(--vleast));
+      width: var(--size);
+      height: var(--size);
+      
+      padding: calc(2*var(--vleast));
+      
+      background: white;
+      /*word-wrap: break-word;*/
+      overflow: hidden;
+    }
+
+
+
+
+    .tracks  .current {
+      background: darkgrey;
+    };
+
+    .player{
+      background: red;
+    };
+
+
+
+
 
   </style>
 </head>
 
 <body>
-  <div class="topping">
-    <div id="fileinput_container">
-      <input type="file" multiple  accept="audio/*, video/*" id="fileinput" name="fileinput" />
-      <label for="fileinput" id="fileinput_label">Add local track</label>
-    </div>
-    <div id="urlinput_container">
-      <input type="url" id="urlinput" name="urlinput">
-      <label for="urlinput">audio <span>not</span> exists</label>
-      <button>Add remote url track</button>
-    </div>
-  </div>
+  <div class="app">
+ 
+  <nav class="footer">
+    <div class="playlist_tab_toggler"><icon>playlist</icon></div>
+    <div class="player_tab_toggler"><icon>player</icon></div>
+  </nav><!-- footer end -->
 
-  <ul id="tracks">  </ul>
+  <div class="tabs">
+    <main class="main_tab visible">
+      <header class="header">head</header><!-- header end -->
+      <div class="feed">feed</div><!-- feed end -->
+    </main><!-- main end -->
+    <div class="playlist_tab hidden">
+      <ul class="tracks">tracks</ul><!-- tracks end -->
+      
+      <div class="add_file hidden">
+
+        <div class="urlinput_container">
+          <input type="url" id="urlinput" name="urlinput" placeholder="url">
+          <label for="urlinput">audio <span>not</span> exists</label>
+          <button>Add remote url track</button>
+        </div>
+        <div class="fileinput_container">
+          <input type="file" multiple  accept="audio/*, video/*" id="fileinput" name="fileinput" />
+          <label for="fileinput" id="fileinput_label">Add local tracks</label>
+        </div>
+        <div class="close">close</div>
+      </div><!-- add_file end -->
+      <div class="controls">
+        <div class="show_add_file control_button">+</div>
+      </div>
+      <div class="controls">
+        <div class="mix_mode control_button">shuffled</div>
+       
+      </div>
+    </div><!-- playlist end -->
+  
+    <div class="player_tab hidden">
+      
+
+      <div class="track_name"></div>
+      <div class="player"></div>
+      <div class="controls">
+        <div class="prev_track control_button">prev</div>
+        <div class="playpause_mode control_button">play</div>
+        <div class="next_track control_button">next</div>
+      </div><!--controls end-->
+    </div><!-- player_tab end-->
+  </div><!-- tabs end -->
+  
+  </div><!-- app end -->
 
   <script defer>
-  let domtrackslist = document.querySelector("#tracks");
-  let audiolist = [];
-  audiolist.i = 0;
 
-  audiolist.next = function (otarget = this) {
-    if (otarget.length < 1) { otarget.i = -1; throw "storage length less or equal 0"; };
+
+  class Renderable{
+    #fragment;
+    #render_function;
+    constructor(renderfn){
+      this.#fragment = new DocumentFragment();
+      this.#render_function = renderfn;
+    };
+    get dom(){
+      let d = this.#render_function();
+      if(d){this.#fragment.append(d);};
+      return this.#fragment;
+    };
+  }
+
+  class Player_worker extends Renderable {
+
+    #dom_player;
+    #onplayend;
+
+
+
+    constructor(){
+      function render(){
+        //console.log("render worker");
+        return this.#dom_player;
+      }
+      super(render);
+      this.#dom_player = document.createElement("audio");
+      this.#dom_player.controls = true;
+      this.#dom_player.crossOrigin = "anonymous";
+    };
+
+
+    play(track){
+      if(track){ this.#dom_player.src = track.url;};
+      this.#dom_player.play();
+      return true;//Y?
+    };
     
-    ++otarget.i;
-    if (otarget.i >= otarget.length) { otarget.i = 0; };
-      
-    return otarget[otarget.i];
-  };
+    pause(){
+      this.#dom_player.pause();
+      return;//Y?
+    };
 
 
-  let audio = document.createElement("audio");
-  audio.controls = "controls";
-  document.body.appendChild(audio);
+    set_track(track){
+      if(track){ 
+document.querySelector(".track_name").innerText = JSON.stringify(track).replace(/\,/g,", ");
 
-  function audioonplayend(el) {
-    //debugger;
-    el.target.src = audiohookslist.next().url;
-    el.target.play();
-    return true;
-  };
+       let was_paused = this.#dom_player.paused;
 
-  audio.addEventListener("ended", audioonplayend);
-  
-  let audiohookslist = new Proxy(audiolist, {
-    "set": function (otarget, skey, vvalue) {
+        this.#dom_player.src = track.url;
 
-     //if key is not a number, set anyway
-     if (isNaN(+skey)) { otarget[skey] = vvalue; return true; };
-
-     //if key is number, check object properties
-     if (!vvalue.url || !vvalue.name) { return false; };
-
-     otarget.push(vvalue);
-
-     let li = document.createElement("li");
-     li.innerText = vvalue.name;
-     domtrackslist.appendChild(li);
-
-     if (audio.src == "") { audio.src = vvalue.url };
-       return true;
-     }
-   });
-
-  const push_files_to_list = (player => (files => {
-    for (let i = 0, l = files.length; i < l; ++i) {
-      let file = files[i];
-      try{
-        let can = player.canPlayType(file.type); // "" => false, ie cant
-        if(!can){ 
-          throw new Error("file extension defenitely cant be played");
+        if(was_paused){
+          this.pause();
+        }else{ 
+          this.play()
         };
-      } catch (err){ 
-        console.error(err);
-        //continue;
+        return true;
+      };
+      return false;
+    };
+
+    set play_end_callback(cb){
+     const t = this;
+     if(t.#onplayend) this.#dom_player.removeEventListener("ended",t.#onplayend);
+     t.#onplayend = cb;
+     if(cb) this.#dom_player.addEventListener("ended", t.#onplayend);
+    };
+
+    get play_end_callback(){
+      const cb = t.#onplayend;//idk why i ve done this?
+      return cb;
+    };
+    
+  };// end Player_worker
+
+  class Player_controller extends Renderable {
+
+    player_worker ;
+    _playlist;
+
+    constructor(){
+
+
+      function render(){
+        //console.log("controller rendered");
+        this.tracks_render();
+        this.player_render();
+      };
+
+      super(render);
+
+      this.tracks_render = ()=>{
+        let parent = document.querySelector(".tracks");
+        parent.replaceChildren();
+        parent.appendChild( this._playlist.dom);
+      };
+
+      this.player_render = ()=>{
+        let parent = document.querySelector(".player");
+        parent.replaceChildren(); 
+        parent.appendChild( this.player_worker.dom);
+      };//todo eliminte duplication
+
+
+      this.player_worker = new Player_worker();
+      this._playlist = new Playlist();
+      
+      this.player_worker.play_end_callback = ()=>{
+        this.player_worker.set_track(this._playlist.next)
+        this.player_worker.play();
+      };
+
+      this._playlist.after_track_set_callback = ()=>{
+        this.player_worker.set_track(this._playlist.current_track);
       };
       
-      audiohookslist.push({ url: URL.createObjectURL(file), name: file.name });
+      //this.dom;
     };
-  }))(audio);
+
+
+    add(tr){
+      if(this._playlist.empty){
+        this._playlist.add(tr);
+        this.player_worker .set_track(this._playlist.next);
+        this.player_worker.pause();
+      }else{
+        this._playlist.add(tr);
+      };
+    }
+
+    mix_mode({shuffle}={}){
+      
+      //console.log("mode",shuffle);
+      if(shuffle){
+        this._playlist.shuffle();
+      } else {
+        this._playlist.straight();
+      };
+      this.tracks_render();
+    };
+
+    play({track}={}){
+//what if track is not in playlist
+      this.player_worker .set_track(track);
+      this.player_worker.play();
+    };
+
+    pause({track}={}){
+      this.player_worker .set_track(track);
+      this.player_worker.pause();
+    };
+
+
+    go_prev_track(){
+      this.player_worker.set_track( this._playlist.prev);
+    };
+    go_next_track(){
+      this.player_worker.set_track( this._playlist.next);
+    };
+
+  };//end Player_controller
+
+
+  class Playlist extends Renderable{
+    
+    #repeat_one_mode;
+    get repeat_one_mode() {return this.#repeat_one_mode;};
+
+    #repeat_list=false;
+    get repeat_list_mode() {return this.#repeat_list;};
+
+    #current_track;
+    get current_track(){return this.#current_track;};
+
+    set #current_track_i(t_i){
+      this.#play_order.set_current(t_i);
+      this.#current_track= this.tracks[t_i];
+      if(this.after_track_set_callback){ 
+        this.after_track_set_callback();
+      };
+    };//TODO!!!!!rearranging
+
+    after_track_set_callback;
+    #current_track_dom;
+                            
+                            
+    tracks;
+    #play_order;//ref to other array
+    #straight_order;//stack?
+    #shuffled_order;//architectural problem with setting track, inverse array needed
+
+    constructor(){ 
+      function render(){
+        //console.log("playlist render");
+        
+        let frag = new DocumentFragment();
+
+        let click_track_callback = i =>(e)=>{
+          console.log("click track");
+          this.#current_track_dom?.classList.remove("current");
+          this.#current_track_i=i;
+          this.#current_track_dom = e.target;
+          e.target.classList.add("current");
+          
+        };
+        const ts= this.#play_order._container.map(i=>{
+          let t = this.tracks[i];
+          t.click_callback = click_track_callback(i);
+          return t.dom;
+        });
+        frag.append(...ts);
+        return frag;
+      }
+      super(render);
+      
+      this.#repeat_one_mode=false;
+      this.#repeat_list=false;
+
+      this.tracks=[];
+
+      this.#straight_order=new Straight_play_order();//stack?
+      this.#shuffled_order=new Shuffled_play_order();
+     
+      this.#play_order= this.#shuffled_order;
+    };
+
+    add(track){
+      let i = -1 + this.tracks.push(track);//returns length after push, which -1 is the index of new element
+      this.#straight_order.add(i);
+      this.#shuffled_order.add(i);
+    };
+
+    get next(){
+      
+      if(!this.repeat_one_mode) this.#current_track=this.tracks[this.#play_order.next({repeat:this.repeat_list_mode})];
+      return this.#current_track;
+    };
+    get prev(){
+      
+      if(!this.repeat_one_mode) this.#current_track=this.tracks[this.#play_order.prev({repeat:this.repeat_list_mode})];
+      return this.#current_track;
+    };
+
+    straight(){
+      let i = this.#play_order.current_i;
+      this.#play_order =this.#straight_order;
+      this.#play_order.set_current(i);
+      //console.log(`stra ${i}_>${this.#play_order.current_i}`);
+    }m
+    shuffle(){
+      let i = this.#play_order.current_i;
+      this.#play_order =this.#shuffled_order;
+      this.#play_order.set_current(i);
+      //console.log(`shuf ${i}_>${this.#play_order.current_i}`);
+    }
+
+    get empty(){
+      return 0 === this.tracks.length;
+    };
+
+  };//end Playlist
+ 
+  class Play_order {
+    _current_i;
+    get current_i(){return this._current_i;};
+    _container;
+    constructor(){
+      this._current_i = 0;
+      this._container = [];
+    };
+
+    next(repeat=true){
+
+      ++this._current_i;
+
+      if(this._current_i>=this._container.length){
+        if(repeat){
+          this._current_i=0;
+        }else{
+          this._current_i=(this._container.length-1);
+        };
+      };
+      return this._container[this._current_i];
+    };
+
+    prev(repeat=true){
+
+      --this._current_i;
+
+      if(this._current_i<0){
+        if(repeat){
+          this._current_i=this._container.length-1;
+        }else{
+          this._current_i=0;
+        };
+      };
+      return this._container[this._current_i];
+    }
+
+    fill_from( order){
+      throw new Error("not implemented");
+    };
+
+    add(index_of_track){
+      throw new Error("not implemented");
+    };
+    
+    is_valid_index(i){
+      return 0<=i && i < this._container.length;
+    };
+    set_current(i){
+      if(this.is_valid_index(i)){
+        this._current_i=i;
+      };
+    };
+  };//end Play_order
+
+
+  class Straight_play_order extends Play_order{
+    constructor(){super();};
+    
+    
+    fill_from(order){
+      this._container=Array.from(order);
+    };
+    
+    add(w){
+      this._container.push(w);
+    };
+  };//end Straight_play_order
+
+  class Shuffled_play_order extends Play_order{
+    inversed_order;
+    constructor(){
+      super();
+      this.inversed_order=[];
+    
+    };
+
+    get current_i(){return this._container[this._current_i];};
+    
+    fill_from(order){
+      const c=Array.from(order);
+
+      for (let i = c.length-1;i >=0;--i){
+        const random_index = Math.round(Math.random()*i);
+        c[i]=c[random_index];
+        this.inversed_order[random_index]= i;//experimental
+      };
+      this._container = c;
+    };
+
+    add(w){
+      const max_i = this._container.length-1;
+      const random_index = Math.round(Math.random()*max_i); // normal distribution, probability of insertion to middle higher which is  incorrect , flat needed, maybe full reshuffle
+
+      this._container.splice(random_index,0,w);//bevare the complexity=O(n)
+
+      //this.inversed_order[w]= random_index;//wrong cause splice index invalidation
+      this.inversed_order.length++;
+      this._container.forEach((v,k)=>{this.inversed_order[v]=k;});//experimental
+    };
+
+    set_current(i){
+      if(this.is_valid_index(i)){
+        console.log(i, this._current_i, this._container,this.inversed_order )
+        this._current_i= this.inversed_order[i];
+      };
+    };
+
+  };//end Shuffled_play_order
+
+
+  class Track extends Renderable{
+    id;
+    name;
+    url;
+
+    #dom;
+
+    constructor(file){
+      function render(){
+//console.log(`track rendered: ${this.name}`);
+      let li = this.#dom;
+      li = document.createElement("li");
+
+      li.addEventListener("click", this.#click_callback);
+
+      let div = document.createElement("div");
+      div.innerText = this.name;
+      li.append(div);
+      return li;
+    };
+
+      super(render)
+      this.id="";
+      this.name=file.name;
+      this.url= URL.createObjectURL(file);
+    }
+
+    #click_callback;
+    set click_callback(fn){
+        if(fn){
+          if(this.#dom) this.#dom.removeEventListener("click", this.#click_callback);
+          this.#click_callback = fn;
+        };
+    };
+
+    
+
+
+
+  };//end Track
+ 
+
+
+  const player_brain = new Player_controller();
+
+  const push_files_to_list = files => {
+console.log("push_files");
+    for (let i = 0, l = files.length; i < l; ++i) {
+      let file = files[i];
+      player_brain.add(new Track(file));
+    };
+  player_brain.dom;
+  };
 
   let fileinput = document.querySelector("#fileinput");
   fileinput.addEventListener("change",e=>{
@@ -173,13 +890,118 @@
     push_files_to_list(event.dataTransfer.files);
   });
 
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register("/localplayer/serviceworker.js", { scope: "/localplayer/" })
-    .then(_ => console.log("sw ok"))
-    .catch(_ => console.log(`sw not ok : ${_}`));
-  } else {
-     console.log("no sw ");
+
+
+
+//!!!refactoring following needed!!!
+
+let [main,playlist,player] = [".main_tab",".playlist_tab",".player_tab"].map(s=>document.querySelector(s).classList);
+
+let visible = 0;
+
+const [t1,t2]= [".player_tab_toggler",".playlist_tab_toggler"].map(s=>document.querySelector(s));
+
+t1.addEventListener("click",()=>{
+  if(visible!==1){
+
+    visible=1;
+
+    [main,playlist].map(e=>(e.remove("visible"),e)).map(e=>e.add("hidden"));
+    player.remove("hidden");
+    player.add("visible");
+
+    t2.classList.remove("active");
+    t1.classList.add("active");
+    
+  }else{
+    visible=0;
+
+    player.add("hidden");
+    player.remove("visible");
+    main.remove("hidden");
+    main.add("visible");
+
+    t1.classList.remove("active");
   };
+});
+
+t2.addEventListener("click",()=>{
+
+if(visible!==2){
+
+    visible=2;
+
+    [main,player].map(e=>(e.remove("visible"),e)).map(e=>e.add("hidden"));
+    playlist.remove("hidden");
+    playlist.add("visible");
+
+    t1.classList.remove("active");
+    t2.classList.add("active");
+  }else{
+    visible=0;
+
+    playlist.add("hidden");
+    playlist.remove("visible");
+    main.remove("hidden");
+    main.add("visible");
+
+    t2.classList.remove("active");
+  };
+});
+
+let shuffle = true;
+document.querySelector(".mix_mode").addEventListener("click",(e)=>{
+  shuffle = !shuffle;
+  player_brain.mix_mode({shuffle});
+e.target.innerText = ` ${shuffle?"shuffle":"straight"}`;
+});
+
+
+let [play,pause]= [false,true];
+document.querySelector(".playpause_mode").addEventListener("click",(e)=>{
+  [play,pause]=[!play,!!play];
+  if(play){player_brain.play(); };
+  if(pause){player_brain.pause();};
+  e.target.innerText = play ? "pause" : "play";
+});
+
+//document.querySelector(".track_name");
+
+
+const [go_prev, go_next] = [".prev_track",".next_track"].map(s=>document.querySelector(s));
+
+go_prev.addEventListener("click",()=>{
+  player_brain.go_prev_track();
+  //console.log("prev");
+});
+go_next.addEventListener("click",()=>{
+  player_brain.go_next_track();
+  //console.log("next");
+});
+
+
+let file_add = document.querySelector(".add_file");
+let closed=true;
+
+
+let show_add_file = document.querySelector(".show_add_file");
+show_add_file.addEventListener("click", (e)=>{
+  file_add.classList.add("visible");
+  file_add.classList.remove("hidden");
+  closed=false;
+  show_add_file.classList .add("hidden");
+  show_add_file.classList .remove("visible");
+});
+
+document.querySelector(".add_file .close").addEventListener("click",(e)=>{
+  file_add.classList.add("hidden");
+  file_add.classList.remove("visible");
+  closed=true;;
+  show_add_file.classList .add("visible");
+  show_add_file.classList .remove("hidden");
+});
+
+console.log("end_script")
 
 
     </script>

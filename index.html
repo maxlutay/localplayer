@@ -499,10 +499,11 @@ border: 1px dotted darkslategray;
       if(track){ 
 document.querySelector(".track_name").innerText = JSON.stringify(track).replace(/\,/g,", ");
 
-       navigator?.mediaSession?.metadata = new MediaMetadata({
-       title: track.name
-       });
-
+       if(navigator?.mediaSession){ 
+         navigator.mediaSession.metadata = new MediaMetadata({
+           title: track.name
+         });
+       };
        let was_paused = this.#dom_player.paused;
 
         this.#dom_player.src = track.url;

@@ -12,12 +12,30 @@
   <div class="header">h</div><!--.header-->
   <div class="feed">f</div><!--.feed-->
   <div class="playing_interface minimized">
+   <div class="playing_interface--utility-no_border_radius"><!-- this fixing  mix-blend-mode and parent border-radius bug -->
+    <div class="top_spacer">
+      <div class="top_spacer__pin"></div>
+    </div><!--.top_spacer-->
+    <div class="current_track_info">
+      <div class="current_track_info__utility_line">
+        <div class="track_name">Some Long Track Name </div>-
+        <div class="track_performer"> Some famous performer</div> 
+        <div class="track_album">(some long name album)</div> 
+      </div>
+    </div><!--.current_track_info-->
+    <div class="progress_bar">
+      <div class="progress_max">
+        <div class="progress_play"></div> 
+        <div class="progress_load"></div>
+      </div>
+    </div><!--.progress_bar-->
+   </div>
   </div><!--.player_interface-->
 
 
 </div><!-- app-->
 
-<!-- <script>
+<script>
 
 const qs = document.querySelector.bind(document);
 
@@ -40,8 +58,7 @@ playing_interface.addEventListener("pointerout",e=>{
   playing_interface. classList.add("full");
 });
 
-</script> -->
+</script>
 
 </body>
 </html>
-

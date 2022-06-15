@@ -2,24 +2,214 @@
   margin: 0;         
   padding: 0;
   border: 0;
-  outline: 0;
-  overflow: hidden;
+  outline: none;
+  overflow: visible;
   box-sizing: border-box;
-}
-
-.app{
-  height:100vh;
-  width:100vw;
-  background: #fff;
 }
 
 
 :root {
-  --vsmaller: min(1vh,1vw);
+  --app_background:#fff;
+  --app_background:#aaa;
+}
+
+.app 
+{
+  height:100vh;
+  min-height:100vh;
+ /* height: fill-available*/;
+  width:100vw;
+  background: var(--app_background);
+  position: absolute;
+  top:0;
+  left:0;
+}
+
+
+:root {
   --player_interface_background: #fff;
   --player_interface_text_color: #000;
 }
 
+
+:root{
+  --playing_interfave_height_when_full:99vh;
+  --playing_interface_height_when_minimized: 15vh;
+}
+
+
+.playing_interface{
+  --width: 99.5vw;
+  width: var(--width);
+
+
+  position: absolute;
+  
+  left: calc((100vw - var(--width))/2);
+  
+  --border-radius-value: 4vmin ;
+  border-radius: var(--border-radius-value);
+  overflow: hidden;
+
+  border: 1px solid var(--player_interface_text_color);
+  background: var(--player_interface_background);
+  color: var(--player_interface_text_color);
+  
+  z-index: 0;
+
+  display: flex;
+  justify-content:start;
+}
+
+.playing_interface.full {
+  --height: var(--playing_interface_height_when_full);
+  height: var(--height);
+  min-height: var(--height);
+  max-height: var(--height);
+  top: calc((100vh - var(--height))/2);
+  flex-direction: column;
+}
+
+.playing_interface.minimized {
+  --height: var(--playing_interface_height_when_minimized);
+  height: var(--height);
+  min-height: var(--height);
+  top: calc((90vh - var(--height)));
+  flex-direction: row;
+}
+
+
+.playing_interface>*{
+  --opaque_white: rgba(255,255,255,0);
+  width:100%;
+  min-height: 2vh;
+  background:var(--opaque_white);
+}
+
+.status {
+  position:relative;
+}
+
+.track_info__cover{
+  background: repeating-linear-gradient(-45deg,
+      lightcyan 0 5%,
+      lightgray 5% 10%);
+}
+
+.full .track_info__cover{
+  height:100vmin;
+  width: 100vmin;
+}
+
+
+.full .progress_time {
+  --padding: 0.2em;
+  --font-height: 1em;
+  --border-radius: var(--padding);
+
+  position: absolute;
+  
+  top: calc(50% - (var(--font-height) + var(--padding))/2);
+  top:0;
+  bottom:0;
+  height:fit-content;
+
+  left: 0;
+  right: 0;
+  width: fit-content;
+
+  margin: auto;
+  border: 1px solid black;
+  border-radius: var(--border-radius);
+  padding: var(--padding);
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+
+} 
+
+
+.progress_time__separator{
+  background:#fff;
+  width: 8px;
+  height: max-content;
+  border: 1px solid #000;
+  display: block;
+}
+
+.minimized .track_info__cover{
+  height:15vmin;
+  width:15vmin;
+}
+
+
+
+.progress_bar {
+  --progress_bar_height_when_full:30vh;
+  --progress_bar_height_when_minimized:100%;
+
+  min-height: 1vh;
+  
+  width: 100%;
+
+  background:
+   linear-gradient(0turn,   hsla(0.12turn,90%,95%,0.5),hsla(0.5turn, 90%,95%,0.7))
+  ,linear-gradient(0.67turn,hsla(0.45turn,90%,95%,0.5),hsla(0.83turn,90%,95%,0.7))
+  ,linear-gradient(0.33turn,hsla(0.79turn,90%,95%,0.5),hsla(1.17turn,90%,95%,0.7));
+
+
+  animation: progress_filter_hue 10s linear infinite alternate;
+  
+
+  --play_progress: 20%;
+  --load_progress: 65%;
+}
+
+
+.pause .progress_bar {
+  animation-play-state: paused;
+}
+
+.minimized .progress_bar{
+  height:var(--progress_bar_height_when_minimized);
+
+  position: absolute;
+  bottom:0;
+  left:0; 
+  z-index: -1;
+}
+
+.full .progress_bar{
+  height:var(--progress_bar_height_when_full);
+}
+
+@keyframes track_info_scroll {
+  0%, 50% {
+    transform: translateX(1%);
+    left: 0%;
+  }
+  
+  90%, 100%{
+    transform: translateX(-101%);
+    left: 99%;
+  }
+}
+
+
+@keyframes progress_filter_hue {
+  0%, 3%, 97%, 100% {
+    /*background: magenta;*/
+    filter: hue-rotate(0deg);
+  }
+  30%, 36% {
+    /*background: yellow;*/
+    filter: hue-rotate(120deg);
+  }
+  64%, 70% {
+    /*background: cyan;*/
+    filter: hue-rotate(240deg);
+  }
+}
 
 
 

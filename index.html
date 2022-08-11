@@ -10,41 +10,49 @@
 <body>
 <div class="app">
 
-  <div class="header">header</div><!--.header-->
+  <div class="app__header">header</div><!--.header-->
 
-  <div class="feed">feed</div><!--.feed-->
+  <div class="app__feed">feed</div><!--.feed-->
 
-  <div class="playing_interface full">
-    <div class="status">
-      <div class="progress_bar"></div>
-      <div class="progress_time">
-        <span class="progress_time__current">0:00</span>
-        <span>|</span>
-        <span class="progress_time__total">9:99:99</span>
+  <div class="app__footer">footer</div> <!--.footer-->
+
+  <div class="app__view player_interface player_interface--full">
+    <div class="player_interface__progress play_progress">
+      <div class="play_progress__bar"></div>
+      <div class="play_progress__past_shadow"></div>
+      <div class="play_progress__time_group">
+        <div class="play_progress__time_current">XX:XX:XX</div>
+        <div class="play_progress__time_total">XX:XX:XX</div>
       </div>
-    </div><!--.status-->
-    <div class="track_info">
-      <div class="track_info__cover">
-        <img src="" alt="cover">
+    </div><!--.play_progress_status-->
+    <div class="player_interface__controls " >
+      <div class="controls__group controls__group--mandatory">
+        <button class="controls__play_prev">prev</button>
+        <button class="controls__toggle_play_state">play/pause</button>
+        <button class="controls__play_next">next</button>
       </div>
-      <div class="track_info__name">
-        <p>track name</p>
+      <div class="controls__group controls__group--optional controls__group--hidden">
+        <button class="controls__repeat_current">repeat</button>
+        <button class="controls__add_to_favorite">fav</button>
+        <button class="controls__share">share</button>
       </div>
-      <div class="track_info__performer">
-        <p>track performer</p>
-      </div>
-      <div class="track_info__album">
-        <p>album</p>
-      </div>
-    </div> <!--.track_info-->
-    <div class="controls empty" >
-      <div class="controls__mandatory">
-        <button class="play_prev">prev</button>
-        <button class="toggle_play_state">play/pause</button>
-        <button class="play_next">next</button>
-      </div>
-      <div class="controls__optional"></div>
     </div><!--.controls-->
+    <div class="player_interface__track_info ">
+      <div class="track_info__cover">
+        <img class="track_info__cover_image" src="" alt="track cover">
+      </div>
+      <div class="track_info__textual">
+        <div class="track_info__name">
+          <p>track name</p>
+        </div>
+        <div class="track_info__performer">
+          <p>track performer</p>
+        </div>
+        <div class="track_info__album">
+          <p>album</p>
+        </div>
+      </div><!--textual-->
+    </div> <!--.track_info-->
   </div><!--.player_interface-->
 
 </div><!--.app-->
@@ -53,18 +61,18 @@
 
 const qs = document.querySelector.bind(document);
 
-const playing_interface = qs(".playing_interface");
+const playing_interface = qs(".player_interface");
 
-const interface_toggler_button = qs(".playing_interface");
+const interface_toggler_button = qs(".track_info__cover");
 
-/*
+
 interface_toggler_button.addEventListener("pointerenter",e=>{
   e.stopPropagation();
   console.log("toggle");
-  playing_interface.classList.toggle("minimized");
-  playing_interface.classList.toggle("full");
+  playing_interface.classList.toggle("player_interface--minimized");
+  playing_interface.classList.toggle("player_interface--full");
 });
-*/
+
 /*
 interface_toggler_button.addEventListener("pointerout",e=>e.stopPropagation());
 */

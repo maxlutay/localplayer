@@ -11,25 +11,36 @@
 <div class="app">
 
   <div class="app__header">header</div><!--.header-->
-
   <div class="app__feed">feed</div><!--.feed-->
-
   <div class="app__footer">footer</div> <!--.footer-->
 
   <div class="app__view player_interface player_interface--full">
-    <div class="player_interface__progress play_progress">
-      <div class="play_progress__bar"></div>
-      <div class="play_progress__past_shadow"></div>
-      <div class="play_progress__time_group">
-        <div class="play_progress__time_current">XX:XX:XX</div>
-        <div class="play_progress__time_total">XX:XX:XX</div>
+    
+    <div class="player_interface__track_info track_info">
+      <div class="track_info__cover">
+        <img class="track_info__cover_image" src="" alt="track cover">
       </div>
-    </div><!--.play_progress_status-->
-    <div class="player_interface__controls " >
+      <div class="track_info__textual">
+        <span  class="track_info__name">
+          <span>track name looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong</span>
+        </span>
+        <span class="track_info__performer">
+          <span>track performer</span>
+        </span>
+        <span class="track_info__album">
+          <span>album name</span>
+        </span>
+      </div><!--textual-->
+    </div> <!--.track_info-->
+    
+    <div class="player_interface__controls" >
       <div class="controls__group controls__group--mandatory">
-        <button class="controls__play_prev">prev</button>
-        <button class="controls__toggle_play_state">play/pause</button>
+        <button class="controls__play_prev">prev </button> 
+        <!-- <svg></svg> -->
+        <button class="controls__toggle_play_state controls__toggle_play_state--play">play/pause</button>
+        <!-- <svg></svg> -->
         <button class="controls__play_next">next</button>
+        <!-- <svg></svg> -->
       </div>
       <div class="controls__group controls__group--optional controls__group--hidden">
         <button class="controls__repeat_current">repeat</button>
@@ -37,22 +48,20 @@
         <button class="controls__share">share</button>
       </div>
     </div><!--.controls-->
-    <div class="player_interface__track_info ">
-      <div class="track_info__cover">
-        <img class="track_info__cover_image" src="" alt="track cover">
+   
+
+    <div class="player_interface__progress progress">
+      <div class="progress__bar"></div>
+      <div class="progress__past_shadow"></div>
+      <div class="progress__time_group">
+        <div class="progress__time_current">XX:XX:XX</div>
+        <div class="progress__time_total">XX:XX:XX</div>
       </div>
-      <div class="track_info__textual">
-        <div class="track_info__name">
-          <p>track name</p>
-        </div>
-        <div class="track_info__performer">
-          <p>track performer</p>
-        </div>
-        <div class="track_info__album">
-          <p>album</p>
-        </div>
-      </div><!--textual-->
-    </div> <!--.track_info-->
+    </div><!--.progress-->
+
+
+ 
+
   </div><!--.player_interface-->
 
 </div><!--.app-->
@@ -66,7 +75,7 @@ const playing_interface = qs(".player_interface");
 const interface_toggler_button = qs(".track_info__cover");
 
 
-interface_toggler_button.addEventListener("pointerenter",e=>{
+interface_toggler_button.addEventListener("pointerup",e=>{
   e.stopPropagation();
   console.log("toggle");
   playing_interface.classList.toggle("player_interface--minimized");
